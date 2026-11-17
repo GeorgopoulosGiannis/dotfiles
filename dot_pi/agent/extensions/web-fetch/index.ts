@@ -508,7 +508,7 @@ async function extractViaHttp(
 		const reader = new Readability(document as unknown as Document);
 		const article = reader.parse();
 
-		if (!article) {
+		if (!article?.content) {
 			const rscResult = extractRSCContent(text);
 			if (rscResult) {
 				return {
