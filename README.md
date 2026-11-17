@@ -7,6 +7,8 @@ Neovim, git, a handful of macOS preferences, and my configuration for the
 Feel free to copy anything. Most files are self-contained and commented; the sections
 below explain the parts that are not.
 
+![Ghostty with tmux: Neovim with the file tree and LSP hover, Pi coding agent, and the Pi extensions](docs/screenshots/showcase.png)
+
 ## What's inside
 
 | Area | Files | Highlights |
@@ -209,7 +211,7 @@ Things that are easy to trip over, by design or because of how macOS and the app
   `chezmoi state delete-bucket --bucket=scriptState && chezmoi apply`.
 - Third-party code is pinned: zsh plugins and tmux plugins by tag/commit in `.chezmoiexternal.toml.tmpl`,
   Neovim plugins by `nvim-pack-lock.json`, Debian binaries by version and sha256.
-- `README.md`, `AGENTS.md` and `LICENSE` are repo-only and never deployed to `$HOME`.
+- `README.md`, `AGENTS.md`, `LICENSE` and `docs/` are repo-only and never deployed to `$HOME`.
 
 ## Why these choices
 
