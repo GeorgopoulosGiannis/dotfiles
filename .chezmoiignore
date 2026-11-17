@@ -11,11 +11,11 @@
 .pi
 {{ end }}
 
-# Repo docs and server bootstrap helpers: not dotfiles, never deploy to $HOME
+# Repo-only files: documentation, not dotfiles; never deploy to $HOME
 README.md
 AGENTS.md
 LICENSE
-bootstrap
+docs
 .gitignore
 
 # Tmux snapshots can contain private paths and command arguments: keep them local.
