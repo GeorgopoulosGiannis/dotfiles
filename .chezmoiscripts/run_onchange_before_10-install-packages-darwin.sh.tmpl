@@ -1,0 +1,103 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+# Bootstrap macOS packages. Re-runs only when this file changes.
+# Core only: what this dotfiles setup needs to work. Install anything else on demand.
+# Non-destructive: never removes packages that are not listed here.
+set -euo pipefail
+
+# Homebrew lives in /opt/homebrew on Apple Silicon and /usr/local on Intel
+# (same lookup as dot_zprofile).
+find_brew() {
+  local candidate
+  for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    if [ -x "$candidate" ]; then echo "$candidate"; return 0; fi
+  done
+  return 1
+}
+
+if ! command -v brew >/dev/null; then
+  if ! brew_bin="$(find_brew)"; then
+    echo "Installing Homebrew (also installs Xcode Command Line Tools: git, make)..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    brew_bin="$(find_brew)"
+  fi
+  eval "$("$brew_bin" shellenv)"
+fi
+
+brew bundle --no-upgrade --file=- <<'EOF'
+# Shell (dot_zshrc)
+brew "tmux"
+brew "eza"
+brew "direnv"
+brew "fzf"
+brew "zsh-syntax-highlighting"
+brew "zsh-history-substring-search"
+
+# Neovim and what its config/plugins need
+brew "neovim"
+brew "duti"              # macOS file associations for Neovide
+brew "ripgrep"           # telescope grep and file search
+brew "fd"
+brew "tree-sitter-cli"   # nvim-treesitter compiles parsers with it
+brew "mise"              # Node and Go (Mason, markdown preview); installed by the mise script
+
+# Dev and agent tools
+brew "gh"
+brew "betterleaks"       # secret scan in the dotfiles pre-commit hook
+brew "git-lfs"          # the lfs filter in dot_gitconfig
+brew "chezmoi"
+brew "ast-grep"          # structural code search, used by agents
+brew "yt-dlp"            # Pi youtube-transcript skill
+brew "terminal-notifier" # Pi notify-done: clickable notifications that jump to the tmux pane
+
+# Docker without Docker Desktop: Colima runs the engine, docker is the CLI
+brew "colima"
+brew "docker"
+brew "docker-compose"    # `docker compose` plugin (linked below)
+brew "docker-buildx"     # `docker buildx` plugin (linked below)
+
+# Encryption tools (all machines)
+brew "age"
+brew "sops"
+{{- if not (default false (index . "work")) }}
+
+# Personal secrets: passage (installed below). Personal machines only.
+brew "age-plugin-se"     # Secure Enclave identity for passage
+brew "bash"              # passage needs a modern bash
+brew "gnu-getopt"        # passage's macOS platform file uses it
+brew "tree"              # `passage ls`
+{{- end }}
+
+cask "ghostty"
+cask "neovide-app"      # GUI Neovim; default editor for text/code files
+cask "stats"            # menu bar CPU, RAM, disk monitor
+cask "handy"            # local speech-to-text: Option+Space dictates into any app
+EOF
+
+# Let the docker CLI find the Homebrew compose/buildx plugins
+mkdir -p "$HOME/.docker/cli-plugins"
+for plugin in docker-compose docker-buildx; do
+  ln -sfn "$(brew --prefix)/opt/$plugin/bin/$plugin" "$HOME/.docker/cli-plugins/$plugin"
+done
+
+{{- if not (default false (index . "work")) }}
+
+# passage is not in Homebrew; install the pinned upstream release into ~/.local
+PASSAGE_VERSION="1.7.4a2"
+# `passage version` prints the upstream release without the pre-release suffix
+# (tag 1.7.4a2 reports v1.7.4), so compare against that.
+want="v${PASSAGE_VERSION%%[a-z]*}"
+have="$(passage version 2>/dev/null | grep -Eo 'v[0-9]+(\.[0-9]+)+' | head -n1 || true)"
+if [ "$have" != "$want" ]; then
+  tmp="$(mktemp -d)"
+  git -c advice.detachedHead=false clone --quiet --depth=1 --branch "$PASSAGE_VERSION" https://github.com/FiloSottile/passage.git "$tmp/passage"
+  make -C "$tmp/passage" install PREFIX="$HOME/.local" WITH_ALLCOMP=no >/dev/null
+  rm -rf "$tmp"
+  echo "Installed passage $PASSAGE_VERSION to ~/.local/bin (was: ${have:-none})"
+fi
+
+if [ ! -d "$HOME/.passage" ]; then
+  echo "note: no ~/.passage yet. See README 'Secrets (passage)' to restore the store." >&2
+fi
+{{- end }}
+{{ end -}}

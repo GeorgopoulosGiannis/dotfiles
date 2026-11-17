@@ -1,0 +1,18 @@
+{
+  "name": "pi-local-extensions-dev",
+  "private": true,
+  "type": "module",
+  "description": "Shared editor and type-checking dependencies for local Pi extensions.",
+  "scripts": {
+    "typecheck": "tsc --noEmit && npm --prefix web-fetch run typecheck",
+    "test": "node --experimental-strip-types --test web-search/search.test.ts"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "1.5.2",
+    "@earendil-works/pi-tui": "1.5.2",
+    "@types/node": "22.20.5",
+    "@types/shell-quote": "1.7.5",
+    "typebox": "1.3.27",
+    "typescript": "7.0.2"
+  }
+}

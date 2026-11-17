@@ -1,0 +1,16 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+# macOS keyboard shortcuts. Re-runs only when this file changes.
+# Personal preference, not required by the rest of the dotfiles: edit before applying elsewhere.
+# Modifiers: @=Cmd ^=Ctrl ~=Opt $=Shift
+set -euo pipefail
+
+# Services (System Settings > Keyboard > Keyboard Shortcuts > Services)
+# Ctrl+Cmd+G in Finder: open a Ghostty window at the selected folder.
+defaults write pbs NSServicesStatus -dict-add \
+  '"com.mitchellh.ghostty - New Ghostty Window Here - openWindow"' \
+  '{ "key_equivalent" = "@^g"; }'
+
+# Make the services menu pick up the change
+/System/Library/CoreServices/pbs -flush || true
+{{ end -}}

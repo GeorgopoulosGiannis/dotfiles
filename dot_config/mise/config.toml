@@ -1,0 +1,26 @@
+# Global mise config: Node and Go for every project that does not pin its own.
+# A project overrides these with its own mise.toml, .node-version or .nvmrc.
+# Install/upgrade: `mise install` / `upall mise`. Why mise: see the README.
+
+[tools]
+# Node 26 is the version I used with nvm. A bare major tracks the newest 26.x on
+# `mise upgrade`; bump it deliberately. npm ships with Node (dot_npmrc needs npm 11+).
+node = "26"
+# Go: current stable minor. Mason builds goimports with it.
+go = "1.27"
+
+[settings]
+# No surprise downloads: install only through `mise install`, never implicitly when
+# a shim, `mise exec` or a `cd` hits a missing version.
+auto_install = false
+exec_auto_install = false
+not_found_auto_install = false
+
+# Same cooldown as min-release-age in dot_npmrc: skip releases younger than 7 days.
+minimum_release_age = "7d"
+
+# Honour .nvmrc and .node-version in projects (off by default in mise).
+idiomatic_version_file_enable_tools = ["node"]
+
+# Do not print "missing tools" status lines in every prompt.
+status.missing_tools = "never"

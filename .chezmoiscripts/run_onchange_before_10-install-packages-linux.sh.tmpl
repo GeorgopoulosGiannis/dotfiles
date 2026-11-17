@@ -1,0 +1,150 @@
+{{- $profile := get . "profile" | default "dev" -}}
+{{- if eq .chezmoi.os "linux" -}}
+#!/usr/bin/env bash
+# Bootstrap a Debian/Ubuntu machine (developed against Debian 13). Re-runs only when
+# this file changes, so bumping a pinned version below re-runs the install.
+set -euo pipefail
+
+if ! command -v apt-get >/dev/null; then
+  echo "apt-get not found, skipping package install" >&2
+  exit 0
+fi
+
+SUDO=""; [ "$(id -u)" -ne 0 ] && SUDO="sudo"
+
+$SUDO apt-get update
+# Base packages, installed on every profile
+$SUDO apt-get install -y \
+  zsh tmux git git-lfs curl wget unzip ca-certificates vim \
+  ripgrep fd-find fzf \
+  zsh-syntax-highlighting
+
+# Debian names the fd binary fdfind; expose it as fd
+mkdir -p "$HOME/.local/bin"
+command -v fdfind >/dev/null && ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
+{{- if eq $profile "dev" }}
+
+# Dev profile: compilers for nvim plugins, Mason and tree-sitter. Node and Go come from
+# mise (installed below, toolchains by run_onchange_after_10-mise-tools), not apt.
+$SUDO apt-get install -y build-essential direnv
+
+# Optional extras: not packaged on older Debian releases, so don't fail if missing
+for pkg in eza age sops gh; do
+  $SUDO apt-get install -y "$pkg" || echo "note: $pkg not available via apt, skipping" >&2
+done
+
+# --- Pinned upstream binaries (apt's Neovim is too old for this config) ---
+# Bump a version and its checksums together; checksums are the release assets' sha256.
+NVIM_VERSION="v0.12.6"
+NVIM_MIN_VERSION="0.12"   # the config uses vim.pack (Neovim 0.12+)
+NVIM_SHA256_X86_64="474430d53e6264f6d6dd18db42d6dc9df3a1b56ca9e88a325bbf860e1a811d87"
+NVIM_SHA256_AARCH64="8f1f64a0bdb97247034038c3823c6cbad5bdf9ecd5751b85494b71c3ee04c815"
+
+TS_VERSION="v0.27.2"
+TS_SHA256_X86_64="7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a"
+TS_SHA256_AARCH64="34fcc5c4fa7bdd2058a2a45a03b6eb9a49b03a93b6d52ec750f99b1516d98d33"
+
+# mise manages Node and Go. Pinned release binary with a checksum rather than mise's apt
+# repo: it needs no extra signing key or apt source on the machine, matches how Neovim
+# and tree-sitter are installed here, and keeps `mise self-update` working (upall).
+MISE_VERSION="v2026.11.9"
+MISE_SHA256_X86_64="f13f3e5ec88807e0161669b3aa07a91d84478cdf1e95b5b92b63f85a25d42395"
+MISE_SHA256_AARCH64="b8dd05af6447cee933928664982a8cb2fa646e6951cfc8539db23ce2554a7b04"
+
+# version_ge HAVE WANT: true when HAVE >= WANT (dotted versions)
+version_ge() { [ "$(printf '%s\n%s\n' "$2" "$1" | sort -V | head -n1)" = "$2" ]; }
+
+# Neovim: install when missing, older than the minimum, or when our own copy
+# in ~/.local/nvim differs from the pinned version.
+install_nvim=0
+if ! command -v nvim >/dev/null; then
+  install_nvim=1
+else
+  nvim_have="$(nvim --version | sed -n '1s/^NVIM v\([0-9][0-9.]*\).*/\1/p')"
+  if ! version_ge "${nvim_have:-0}" "$NVIM_MIN_VERSION"; then
+    install_nvim=1
+  elif [ -x "$HOME/.local/nvim/bin/nvim" ] &&
+       [ "$("$HOME/.local/nvim/bin/nvim" --version | head -n1)" != "NVIM $NVIM_VERSION" ]; then
+    install_nvim=1
+  fi
+fi
+
+if [ "$install_nvim" -eq 1 ]; then
+  case "$(uname -m)" in
+    x86_64)  asset="nvim-linux-x86_64"; sha="$NVIM_SHA256_X86_64" ;;
+    aarch64) asset="nvim-linux-arm64";  sha="$NVIM_SHA256_AARCH64" ;;
+    *) echo "unsupported arch for nvim" >&2; exit 1 ;;
+  esac
+  tmp="$(mktemp -d)"
+  curl -fsSL --retry 3 "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/${asset}.tar.gz" \
+    -o "$tmp/nvim.tar.gz"
+  echo "$sha  $tmp/nvim.tar.gz" | sha256sum -c - >/dev/null ||
+    { echo "error: checksum mismatch for Neovim ${NVIM_VERSION}" >&2; rm -rf "$tmp"; exit 1; }
+  rm -rf "$HOME/.local/nvim"
+  mkdir -p "$HOME/.local"
+  tar -xzf "$tmp/nvim.tar.gz" -C "$tmp"
+  mv "$tmp/$asset" "$HOME/.local/nvim"
+  ln -sf "$HOME/.local/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+  rm -rf "$tmp"
+  echo "Installed Neovim ${NVIM_VERSION} to ~/.local/nvim"
+fi
+
+# tree-sitter CLI: nvim-treesitter (main branch) needs it to compile parsers.
+# Optional step: a failed download (e.g. GitHub release outage) or checksum mismatch
+# must not abort the script.
+install_ts=0
+if ! command -v tree-sitter >/dev/null; then
+  install_ts=1
+elif [ -x "$HOME/.local/bin/tree-sitter" ] &&
+     ! "$HOME/.local/bin/tree-sitter" --version | grep -q " ${TS_VERSION#v}\b"; then
+  install_ts=1
+fi
+
+if [ "$install_ts" -eq 1 ]; then
+  case "$(uname -m)" in
+    x86_64)  ts_asset="tree-sitter-linux-x64";   ts_sha="$TS_SHA256_X86_64" ;;
+    aarch64) ts_asset="tree-sitter-linux-arm64"; ts_sha="$TS_SHA256_AARCH64" ;;
+    *) ts_asset="" ;;
+  esac
+  ts_tmp="$(mktemp -d)"
+  if [ -n "$ts_asset" ] &&
+     curl -fsSL --retry 3 --retry-delay 3 --retry-all-errors \
+       "https://github.com/tree-sitter/tree-sitter/releases/download/${TS_VERSION}/${ts_asset}.gz" \
+       -o "$ts_tmp/tree-sitter.gz" &&
+     echo "$ts_sha  $ts_tmp/tree-sitter.gz" | sha256sum -c - >/dev/null; then
+    gunzip -f "$ts_tmp/tree-sitter.gz"
+    install -m 755 "$ts_tmp/tree-sitter" "$HOME/.local/bin/tree-sitter"
+    echo "Installed tree-sitter CLI ${TS_VERSION} to ~/.local/bin"
+  else
+    echo "warning: could not install the tree-sitter CLI (download failed, checksum mismatch or unsupported arch)." >&2
+    echo "  Retry later with: chezmoi state delete-bucket --bucket=scriptState && chezmoi apply" >&2
+    echo "  or install it with: cargo install tree-sitter-cli" >&2
+  fi
+  rm -rf "$ts_tmp"
+fi
+
+# mise: install when missing or older than the pin (newer, e.g. self-updated, is kept).
+mise_have="$(mise --version 2>/dev/null | sed -n '1s/^\([0-9][0-9.]*\).*/\1/p' || true)"
+[ -z "$mise_have" ] && [ -x "$HOME/.local/bin/mise" ] &&
+  mise_have="$("$HOME/.local/bin/mise" --version | sed -n '1s/^\([0-9][0-9.]*\).*/\1/p')"
+if ! version_ge "${mise_have:-0}" "${MISE_VERSION#v}"; then
+  case "$(uname -m)" in
+    x86_64)  mise_asset="mise-${MISE_VERSION}-linux-x64";   mise_sha="$MISE_SHA256_X86_64" ;;
+    aarch64) mise_asset="mise-${MISE_VERSION}-linux-arm64"; mise_sha="$MISE_SHA256_AARCH64" ;;
+    *) echo "unsupported arch for mise" >&2; exit 1 ;;
+  esac
+  tmp="$(mktemp -d)"
+  curl -fsSL --retry 3 "https://github.com/jdx/mise/releases/download/${MISE_VERSION}/${mise_asset}" \
+    -o "$tmp/mise"
+  echo "$mise_sha  $tmp/mise" | sha256sum -c - >/dev/null ||
+    { echo "error: checksum mismatch for mise ${MISE_VERSION}" >&2; rm -rf "$tmp"; exit 1; }
+  install -m 755 "$tmp/mise" "$HOME/.local/bin/mise"
+  rm -rf "$tmp"
+  echo "Installed mise ${MISE_VERSION} to ~/.local/bin (was: ${mise_have:-none})"
+fi
+{{- end }}
+
+if [ "$(basename "${SHELL:-}")" != "zsh" ]; then
+  echo "Run 'chsh -s \$(command -v zsh)' to make zsh your login shell."
+fi
+{{- end }}

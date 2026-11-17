@@ -1,0 +1,7 @@
+# Supply chain cooldown: ignore package versions published less than 7 days ago.
+# Most malicious releases are caught and pulled within days.
+# Bypass once for an urgent fix: npm install --min-release-age=0 <pkg>
+min-release-age=7
+
+# Do not put auth tokens here: this file is tracked by chezmoi.
+# Use per-project .npmrc or `npm login --userconfig` for registries.

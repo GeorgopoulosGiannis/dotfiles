@@ -1,0 +1,36 @@
+{{- $profile := get . "profile" | default "dev" -}}
+{{- if or (eq .chezmoi.os "darwin") (and (eq .chezmoi.os "linux") (eq $profile "dev")) -}}
+#!/usr/bin/env bash
+# Install the global mise toolchains (Node, Go). Runs after the dotfiles are in place, so
+# ~/.config/mise/config.toml exists, and again whenever that file changes.
+# Config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+# Non-destructive: only installs what the config lists.
+set -euo pipefail
+
+# Same lookup as dot_zprofile: Homebrew (macOS) or ~/.local/bin (Debian, see the linux script)
+for brew_bin in /opt/homebrew/bin /usr/local/bin; do
+  [ -x "$brew_bin/brew" ] && export PATH="$brew_bin:$PATH"
+done
+export PATH="$HOME/.local/bin:$PATH"
+
+if ! command -v mise >/dev/null; then
+  echo "mise not found, skipping toolchain install" >&2
+  exit 0
+fi
+
+mise install --yes
+mise ls --current
+{{- if eq .chezmoi.os "darwin" }}
+
+# Leftovers from the previous setup. Never removed automatically.
+leftovers=()
+for formula in node nvm go; do
+  brew list --formula "$formula" >/dev/null 2>&1 && leftovers+=("$formula")
+done
+[ -d "$HOME/.nvm" ] && leftovers+=("$HOME/.nvm")
+if [ ${#leftovers[@]} -gt 0 ]; then
+  echo "note: mise now provides node and go; these can be removed manually: ${leftovers[*]}"
+  echo "  (brew uninstall node nvm go; rm -rf ~/.nvm)"
+fi
+{{- end }}
+{{ end -}}

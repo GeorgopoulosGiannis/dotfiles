@@ -1,0 +1,4 @@
+# Supply chain cooldown: ignore package files uploaded less than 7 days ago.
+# Applies to uv tool installs/upgrades, uv pip, and project resolution.
+# Bypass once for an urgent fix: --exclude-newer "0 days" (or a date).
+exclude-newer = "7 days"

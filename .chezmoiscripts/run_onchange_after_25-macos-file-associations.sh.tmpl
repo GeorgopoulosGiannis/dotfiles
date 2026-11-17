@@ -1,0 +1,52 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+# Finder / `open` defaults. Re-runs only when this file changes.
+# Opinionated: makes Neovide the default app for text and common code/config files.
+# Use explicit extensions, not public.text/source-code, to avoid taking over HTML.
+set -euo pipefail
+
+if ! command -v duti >/dev/null; then
+  for prefix in /opt/homebrew /usr/local; do
+    if [ -x "$prefix/bin/duti" ]; then
+      export PATH="$prefix/bin:$PATH"
+      break
+    fi
+  done
+fi
+if ! command -v duti >/dev/null; then
+  echo "duti not installed, skipping file associations" >&2
+  exit 0
+fi
+
+app="/Applications/Neovide.app"
+if [ ! -d "$app" ]; then
+  app="$HOME/Applications/Neovide.app"
+fi
+if [ ! -d "$app" ]; then
+  echo "Neovide not installed, skipping file associations" >&2
+  exit 0
+fi
+
+# Register even on a fresh install, before Neovide has been launched once.
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$app"
+bundle_id="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Contents/Info.plist")"
+
+# Only extensions with a system-registered file type: macOS refuses default apps for
+# "dynamic" types (dyn.*, error -50), e.g. .jsonc .env .fish .jsx .scss .graphql on macOS 26.
+# What is registered varies by macOS version and installed apps, so a failure only warns.
+failed=()
+for extension in \
+  md markdown txt text log \
+  json yaml yml toml xml csv ini conf cfg \
+  sh bash zsh \
+  py js mjs ts tsx lua vim \
+  rb go rs c h cc cpp hpp java swift \
+  css sql diff patch; do
+  duti -s "$bundle_id" ".$extension" all 2>/dev/null || failed+=(".$extension")
+done
+if [ ${#failed[@]} -gt 0 ]; then
+  echo "note: macOS refused a default app for: ${failed[*]} (no registered file type)" >&2
+fi
+
+echo "Neovide is the default for Markdown, text, and common code/config files."
+{{ end -}}

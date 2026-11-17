@@ -1,0 +1,57 @@
+# Targets chezmoi must never manage (paths relative to $HOME; templated).
+# Finder metadata, anywhere
+**/.DS_Store
+
+{{ if eq (get . "profile" | default "dev") "server" }}
+# Server profile uses plain vim; skip the Neovim config and its toolchain
+.config/nvim
+# Node and Go via mise are dev-only (the install script is skipped on servers too).
+.config/mise
+# Pi is a workstation tool; do not deploy it on minimal servers.
+.pi
+{{ end }}
+
+# Repo docs and server bootstrap helpers: not dotfiles, never deploy to $HOME
+README.md
+AGENTS.md
+LICENSE
+bootstrap
+.gitignore
+
+# Tmux snapshots can contain private paths and command arguments: keep them local.
+.local/share/tmux/resurrect
+.tmux/resurrect
+
+# Pi: track only reviewed config/code, never credentials or runtime state.
+.pi/agent/auth.json
+.pi/agent/**/auth.json
+.pi/agent/**/credentials*.json
+.pi/agent/**/.env
+.pi/agent/**/.env.*
+.pi/agent/**/*.pem
+.pi/agent/**/*.key
+.pi/agent/models-store.json
+.pi/agent/trust.json
+.pi/agent/sessions
+.pi/agent/bin
+.pi/agent/install
+.pi/agent/git
+.pi/agent/npm
+.pi/agent/cache
+.pi/agent/logs
+.pi/agent/settings.json.*.bak
+.pi/agent/**/node_modules
+.pi/agent/**/.venv
+.pi/agent/**/__pycache__
+.pi/agent/**/.git
+.pi/agent/extensions/browser/.profile
+
+{{ if ne .chezmoi.os "darwin" }}
+# Colima (Docker VM) is macOS-only
+.colima
+{{ end }}
+
+# macOS app settings (e.g. Handy): only deploy on macOS
+{{ if ne .chezmoi.os "darwin" }}
+Library
+{{ end }}

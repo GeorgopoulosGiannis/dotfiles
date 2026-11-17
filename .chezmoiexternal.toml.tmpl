@@ -1,0 +1,44 @@
+# Zsh add-ons, pinned to release tags.
+# No refreshPeriod: chezmoi clones once and never updates on its own.
+# To upgrade, bump the tag below and run `chezmoi apply --refresh-externals`.
+
+# All platforms. An existing clone is reused (chezmoi pulls it on first apply).
+[ "powerlevel10k" ]
+    type = "git-repo"
+    url = "https://github.com/romkatv/powerlevel10k.git"
+    [ "powerlevel10k".clone ]
+        args = ["--depth=1", "--branch=v1.20.0"]
+
+# Tmux persistence plugins, pinned to commits (installed code is not tracked).
+# To upgrade, bump the commit URLs and run `chezmoi apply --refresh-externals`.
+[ ".tmux/plugins/tmux-resurrect" ]
+    type = "archive"
+    url = "https://github.com/tmux-plugins/tmux-resurrect/archive/cff343cf9e81983d3da0c8562b01616f12e8d548.tar.gz"
+    stripComponents = 1
+    exact = true
+
+[ ".tmux/plugins/tmux-continuum" ]
+    type = "archive"
+    url = "https://github.com/tmux-plugins/tmux-continuum/archive/0698e8f4b17d6454c71bf5212895ec055c578da0.tar.gz"
+    stripComponents = 1
+    exact = true
+
+{{- if (get . "work" | default false) }}
+
+# Private work-only additions (git rules, aliases, Pi skills), work machines only.
+# Referenced by ~/.gitconfig, ~/.zshrc and Pi settings. Needs GitHub auth (gh auth login).
+[ ".local/share/dotfiles-work" ]
+    type = "git-repo"
+    url = "https://github.com/GeorgopoulosGiannis/dotfiles-work.git"
+    refreshPeriod = "24h"
+{{- end }}
+
+{{- if ne .chezmoi.os "darwin" }}
+
+# Not packaged in Debian (macOS gets it from Homebrew), so clone it
+[ ".local/share/zsh/zsh-history-substring-search" ]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-history-substring-search.git"
+    [ ".local/share/zsh/zsh-history-substring-search".clone ]
+        args = ["--depth=1", "--branch=v1.1.0"]
+{{- end }}

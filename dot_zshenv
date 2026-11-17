@@ -1,0 +1,6 @@
+# Read by every zsh (interactive or not): keep it minimal.
+# Keep PATH free of duplicates, even when nested shells re-add entries.
+typeset -U path PATH
+
+# Rust toolchain (cargo, rustc, rustup): adds ~/.cargo/bin to PATH
+[ -r "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"

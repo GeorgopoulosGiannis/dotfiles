@@ -1,0 +1,25 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /* Pi also writes this file (e.g. lastChangelogVersion), so set only the keys managed
+       here and keep whatever else is in the live file. Work machines may append array
+       settings (packages, skills, ...) via an optional private fragment. */ -}}
+{{- $work := get . "work" | default false -}}
+{{- $settings := dict
+  "externalEditor" "nvim"
+  "defaultProvider" (ternary "github-copilot" "anthropic" $work)
+  "defaultModel" (ternary "gpt-6.1-sol" "claude-opus-5.5" $work)
+  "packages" (list "git:github.com/amosblomqvist/pi-interactive-subagents" "npm:pi-obsidian")
+  "compaction" (dict "enabled" true)
+-}}
+{{- $fragment := joinPath .chezmoi.homeDir ".local/share/dotfiles-work/pi/settings.json" -}}
+{{- if and $work (stat $fragment) -}}
+{{-   range $key, $value := (include $fragment | fromJson) -}}
+{{-     if and (kindIs "slice" $value) (hasKey $settings $key) -}}
+{{-       $_ := set $settings $key (concat (get $settings $key) $value) -}}
+{{-     else -}}
+{{-       $_ := set $settings $key $value -}}
+{{-     end -}}
+{{-   end -}}
+{{- end -}}
+{{- $live := dict -}}
+{{- if .chezmoi.stdin -}}{{- $live = fromJson .chezmoi.stdin -}}{{- end -}}
+{{ toPrettyJson (mergeOverwrite $live $settings) -}}

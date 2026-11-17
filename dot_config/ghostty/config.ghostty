@@ -1,0 +1,4 @@
+# Ghostty: only non-default settings. Reference: ghostty +show-config --default --docs
+# Translucent window with a blurred backdrop.
+background-opacity = 0.85
+background-blur = 20

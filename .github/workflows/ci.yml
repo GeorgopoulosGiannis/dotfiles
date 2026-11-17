@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secrets:
+    name: Secret scan (betterleaks)
+    runs-on: ubuntu-latest
+    env:
+      BETTERLEAKS_VERSION: 1.10.1
+      BETTERLEAKS_SHA256: c174b42d7aa60caf58c0c3e555c0e4bed01fe6b0d99a412bce777b5af4ce913e
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Install betterleaks (pinned, checksum-verified)
+        run: |
+          asset="betterleaks_${BETTERLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -fsSLO "https://github.com/betterleaks/betterleaks/releases/download/v${BETTERLEAKS_VERSION}/${asset}"
+          echo "${BETTERLEAKS_SHA256}  ${asset}" | sha256sum -c -
+          tar -xzf "$asset" betterleaks
+      - name: Scan full history
+        run: ./betterleaks git . --redact --no-banner --verbose
+
+  pi-extensions:
+    name: Pi extensions (typecheck + tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dot_pi/agent/extensions
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: |
+          npm ci --ignore-scripts
+          for d in bash-guard browser web-fetch; do npm --prefix "$d" ci --ignore-scripts; done
+      - run: npm run typecheck
+      - run: npm test
+
+  scripts:
+    name: Shell scripts (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install chezmoi, shellcheck and zsh
+        run: |
+          if [ "$RUNNER_OS" = macOS ]; then
+            brew install chezmoi shellcheck
+          else
+            sudo apt-get update && sudo apt-get install -y shellcheck zsh
+            sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+            echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          fi
+      - name: Render templates for this OS and lint them
+        run: |
+          set -euo pipefail
+          data='{"work":false,"profile":"dev","email":"ci@example.com"}'
+          out=$(mktemp -d)
+          render() { chezmoi --source . execute-template --override-data "$data" < "$1"; }
+          # chezmoi scripts render to nothing on the other OS; shellcheck the rest.
+          for f in .chezmoiscripts/*; do
+            name=$(basename "${f%.tmpl}")
+            render "$f" > "$out/$name"
+            if grep -q '[^[:space:]]' "$out/$name"; then shellcheck "$out/$name"; fi
+          done
+          shellcheck dot_local/private_bin/executable_upall .githooks/pre-commit \
+            dot_pi/agent/extensions/notify-done/executable_queue.sh
+          render dot_zshrc.tmpl > "$out/zshrc"
+          zsh -n "$out/zshrc" dot_zprofile dot_zshenv

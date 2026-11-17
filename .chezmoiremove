@@ -1,0 +1,18 @@
+# Targets chezmoi deletes on apply (paths relative to $HOME): files that were
+# managed here once and would otherwise linger on machines that applied them.
+# Drop an entry once every machine has applied it.
+
+# Work git config moved to the private dotfiles-work repo.
+.gitconfig-work
+
+# Neovim: kickstart layout merged into lua/plugins; kickstart docs removed.
+.config/nvim/.gitignore
+.config/nvim/doc
+.config/nvim/lua/custom
+.config/nvim/lua/kickstart
+
+# Pi: removed extensions and package stubs.
+.pi/agent/extensions/prompt-snippets
+.pi/agent/extensions/observational-memory
+.pi/agent/extensions/interactive-subagents
+.pi/agent/extensions/notify-done/jump.sh

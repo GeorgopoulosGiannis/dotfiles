@@ -1,0 +1,35 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+# macOS system preferences. Re-runs only when this file changes.
+# Opinionated personal defaults (dark mode, fast key repeat, auto-hide Dock, tap to click,
+# hidden desktop icons): review and edit before applying on another Mac.
+# Some settings (key repeat) fully apply after logging out and back in.
+set -euo pipefail
+
+# Appearance: dark mode
+defaults write -g AppleInterfaceStyle -string Dark
+
+# Keyboard: fast repeat, short delay before repeating (lower = faster)
+defaults write -g KeyRepeat -int 2          # fastest in System Settings
+defaults write -g InitialKeyRepeat -int 15  # shortest in System Settings
+
+# Menu bar: never auto-hide (_HIHideMenuBar is still honoured on macOS 26).
+# Dock: hide automatically
+defaults write -g _HIHideMenuBar -bool false
+defaults write com.apple.dock autohide -bool true
+
+# Finder: always show file extensions, list view by default
+defaults write -g AppleShowAllExtensions -bool true
+defaults write com.apple.finder FXPreferredViewStyle -string Nlsv
+
+# Desktop: show only the wallpaper (files stay in ~/Desktop, just hidden)
+defaults write com.apple.finder CreateDesktop -bool false
+
+# Trackpad: tap to click (built-in and Bluetooth trackpads)
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+defaults -currentHost write -g com.apple.mouse.tapBehavior -int 1
+
+killall Dock Finder SystemUIServer 2>/dev/null || true
+echo "macOS defaults applied. Log out and back in for key repeat changes."
+{{ end -}}

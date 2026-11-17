@@ -1,0 +1,60 @@
+" Plain-vim config mirroring the core of ~/.config/nvim/init.lua (no plugins).
+
+" --- Neovim defaults that vim lacks ---
+set nocompatible
+filetype plugin indent on
+syntax on
+set encoding=utf-8
+set autoindent
+set backspace=indent,eol,start
+set hlsearch incsearch
+set laststatus=2
+set ruler showcmd
+set wildmenu
+set ttimeout ttimeoutlen=50
+set hidden
+set display=lastline
+set nrformats-=octal
+
+" --- Options from init.lua ---
+let mapleader = ' '
+let maplocalleader = ' '
+
+set number relativenumber
+set mouse=a
+set clipboard=unnamed           " sync with system clipboard (macOS)
+if has('unnamedplus')
+  set clipboard^=unnamedplus    " Linux/X11
+endif
+set breakindent
+set undofile undolevels=1000
+" Separate from nvim's undo dir: the undo file formats are incompatible
+let s:undo_dir = expand('~/.vim/undo')
+if !isdirectory(s:undo_dir) | call mkdir(s:undo_dir, 'p') | endif
+let &undodir = s:undo_dir
+set noswapfile
+set ignorecase smartcase
+set signcolumn=yes
+set updatetime=250
+set timeoutlen=300
+set splitright splitbelow
+set list listchars=tab:»\ ,trail:·,nbsp:␣
+set cursorline
+set scrolloff=10
+set foldlevel=99 foldlevelstart=99
+set confirm
+
+" --- Keymaps from init.lua ---
+" Double Esc: mapping a single <Esc> breaks terminal vim (escape-sequence replies)
+nnoremap <silent> <Esc><Esc> :nohlsearch<CR>
+nnoremap <C-h> <C-w><C-h>
+nnoremap <C-l> <C-w><C-l>
+nnoremap <C-j> <C-w><C-j>
+nnoremap <C-k> <C-w><C-k>
+tnoremap <Esc><Esc> <C-\><C-n>
+
+" Break the arrow-key habit
+noremap <Up> <nop>
+noremap <Down> <nop>
+noremap <Left> <nop>
+noremap <Right> <nop>

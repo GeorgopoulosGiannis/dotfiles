@@ -1,0 +1,8 @@
+#!/bin/sh
+# Use the repo's versioned hooks (.githooks: secret scan before each commit) in this
+# chezmoi source clone. Runs once per machine.
+set -eu
+src={{ .chezmoi.sourceDir | quote }}
+# Not a writable git clone (e.g. a read-only mount in a test container): nothing to do.
+[ -w "$src/.git/config" ] || exit 0
+git -C "$src" config core.hooksPath .githooks

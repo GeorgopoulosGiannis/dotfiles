@@ -1,0 +1,16 @@
+{{- /* Machine profile, asked once per machine and stored in ~/.config/chezmoi/chezmoi.toml.
+       dev    = full toolchain (nvim, node, go, compilers, tree-sitter)
+       server = minimal: shell, tmux, git, vim
+       macOS is always dev. Pre-answer with: chezmoi init --promptChoice profile=server (flag matches the prompt text) */ -}}
+{{- /* work = work machine: Pi model defaults and the private work additions. Keep existing answers. */ -}}
+{{- $work := promptBoolOnce . "work" "work" -}}
+{{- /* Personal git email: local data only, never committed. Pre-answer with --promptString email=... */ -}}
+{{- $email := promptStringOnce . "email" "email" -}}
+{{- $profile := "dev" -}}
+{{- if ne .chezmoi.os "darwin" -}}
+{{-   $profile = promptChoiceOnce . "profile" "profile" (list "dev" "server") -}}
+{{- end -}}
+[data]
+    work = {{ $work }}
+    email = {{ $email | quote }}
+    profile = {{ $profile | quote }}

@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+# upall: update everything on this machine, on demand, with visible commands.
+#
+#   upall            run all steps, asking before each one
+#   upall -y         run all steps without asking
+#   upall -n         dry run: show the commands, change nothing
+#   upall brew npm   run only the named steps
+#
+# Steps: brew mise npm uv pi nvim mason apt macos
+# Missing tools are skipped (e.g. apt on macOS, brew on Debian).
+# Updates only: nothing is uninstalled. `brew cleanup` deletes old cached downloads
+# and superseded versions; the apt step never runs autoremove or full-upgrade.
+set -uo pipefail
+
+ALL_STEPS=(brew mise npm uv pi nvim mason apt macos)
+ASSUME_YES=0
+DRY_RUN=0
+STEPS=()
+
+for arg in "$@"; do
+  case "$arg" in
+    -y|--yes) ASSUME_YES=1 ;;
+    -n|--dry-run) DRY_RUN=1 ;;
+    -h|--help) sed -n '2,/^set -uo/{/^set -uo/!p;}' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -*) echo "unknown option: $arg" >&2; exit 2 ;;
+    *) STEPS+=("$arg") ;;
+  esac
+done
+[ ${#STEPS[@]} -eq 0 ] && STEPS=("${ALL_STEPS[@]}")
+
+if [ -t 1 ]; then
+  BOLD=$'\e[1m'; DIM=$'\e[2m'; BLUE=$'\e[34m'; GREEN=$'\e[32m'
+  YELLOW=$'\e[33m'; RED=$'\e[31m'; RESET=$'\e[0m'
+else
+  BOLD=; DIM=; BLUE=; GREEN=; YELLOW=; RED=; RESET=
+fi
+
+OK=(); SKIPPED=(); FAILED=()
+
+has() { command -v "$1" >/dev/null 2>&1; }
+
+header() { printf '\n%s%s==> %s%s\n' "$BOLD" "$BLUE" "$1" "$RESET"; }
+
+# Print the command, then run it (unless dry run). Output streams straight through.
+run() {
+  printf '%s$ %s%s\n' "$YELLOW" "$*" "$RESET"
+  [ "$DRY_RUN" -eq 1 ] && return 0
+  "$@"
+}
+
+confirm() {
+  [ "$ASSUME_YES" -eq 1 ] || [ "$DRY_RUN" -eq 1 ] && return 0
+  local reply
+  read -r -p "${BOLD}$1 [Y/n/q] ${RESET}" reply </dev/tty || return 1
+  case "$reply" in
+    q|Q) summary; exit 0 ;;
+    n|N) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+# Run a command as root: directly if we already are, otherwise through sudo.
+as_root() {
+  if [ "$(id -u)" -eq 0 ]; then run "$@"; else run sudo "$@"; fi
+}
+
+# step NAME DESCRIPTION REQUIRED_COMMAND FUNCTION
+step() {
+  local name="$1" desc="$2" need="$3" fn="$4"
+  header "$name: $desc"
+  if ! has "$need"; then
+    echo "${DIM}$need not found, skipping${RESET}"; SKIPPED+=("$name"); return
+  fi
+  if ! confirm "Run $name?"; then
+    SKIPPED+=("$name"); return
+  fi
+  if "$fn"; then OK+=("$name"); else FAILED+=("$name"); echo "${RED}$name failed${RESET}"; fi
+}
+
+do_brew() {
+  run brew update &&
+  run brew outdated --verbose &&
+  run brew upgrade &&
+  run brew cleanup
+}
+
+# Node and Go versions. Upgrades within the pinned majors in ~/.config/mise/config.toml
+# (node 26.x, go 1.27.x) and honours the 7-day minimum_release_age there. A brew-installed
+# mise is updated by the brew step; a standalone one (Debian) updates itself.
+do_mise() {
+  run mise upgrade || return 1
+  # Homebrew owns its mise; self-update is only for a standalone install.
+  if has brew && [[ "$(command -v mise)" == "$(brew --prefix)"/* ]]; then
+    echo "${DIM}mise is managed by Homebrew, updated by the brew step${RESET}"
+  else
+    run mise self-update --yes
+  fi
+}
+
+# npm (the one from mise) respects min-release-age from ~/.npmrc (7-day cooldown)
+do_npm() {
+  run npm outdated --global  # exits 1 when something is outdated
+  run npm update --global
+}
+
+do_uv() { run uv tool upgrade --all; }
+
+do_pi() { run pi update --all; }
+
+# Interactive on purpose: vim.pack shows a review buffer with each plugin's
+# changelog. Read it, then :write to apply or :quit to cancel.
+do_nvim() {
+  if [ ! -t 0 ] && [ "$DRY_RUN" -eq 0 ]; then
+    echo "needs a terminal for the review buffer"; return 1
+  fi
+  echo "${DIM}Review the changes, then :w to apply or :q to cancel.${RESET}"
+  run nvim '+lua vim.pack.update()'
+}
+
+do_mason() {
+  run nvim --headless '+MasonUpdate' '+MasonToolsUpdateSync' '+qa'
+  echo
+}
+
+# Debian/Ubuntu: upgrade installed packages only (no new installs or removals).
+do_apt() {
+  as_root apt-get update &&
+  as_root apt-get upgrade
+}
+
+# List only: macOS updates can need a restart, install them yourself.
+do_macos() {
+  run softwareupdate --list
+  echo "${DIM}Install with: softwareupdate --install --all (or System Settings)${RESET}"
+}
+
+summary() {
+  header "Summary"
+  [ ${#OK[@]} -gt 0 ] && echo "${GREEN}done:${RESET}    ${OK[*]}"
+  [ ${#SKIPPED[@]} -gt 0 ] && echo "${DIM}skipped: ${SKIPPED[*]}${RESET}"
+  [ ${#FAILED[@]} -gt 0 ] && echo "${RED}failed:${RESET}  ${FAILED[*]}"
+
+  # Updates can change chezmoi-tracked files (e.g. the Neovim plugin lockfile)
+  if has chezmoi && [ "$DRY_RUN" -eq 0 ]; then
+    local drift
+    drift="$(chezmoi status 2>/dev/null | grep -v '^ R' || true)"
+    if [ -n "$drift" ]; then
+      echo
+      echo "${YELLOW}chezmoi-tracked files changed:${RESET}"
+      echo "$drift"
+      echo "${DIM}Review with 'chezmoi diff', keep with 'chezmoi add <file>', then commit.${RESET}"
+    fi
+  fi
+}
+
+for s in "${STEPS[@]}"; do
+  case "$s" in
+    brew)  step brew  "Homebrew packages and apps" brew do_brew ;;
+    mise)  step mise  "Node and Go versions (mise upgrade, self-update)" mise do_mise ;;
+    npm)   step npm   "global npm packages (7-day cooldown)" npm do_npm ;;
+    uv)    step uv    "Python tools installed with uv" uv do_uv ;;
+    pi)    step pi    "Pi and its extensions" pi do_pi ;;
+    nvim)  step nvim  "Neovim plugins (review before applying)" nvim do_nvim ;;
+    mason) step mason "Mason LSP servers and tools" nvim do_mason ;;
+    apt)   step apt   "Debian/Ubuntu system packages (needs sudo)" apt-get do_apt ;;
+    macos) step macos "macOS system updates (list only)" softwareupdate do_macos ;;
+    *) echo "${RED}unknown step: $s${RESET} (steps: ${ALL_STEPS[*]})" >&2; FAILED+=("$s") ;;
+  esac
+done
+
+summary
+[ ${#FAILED[@]} -eq 0 ]

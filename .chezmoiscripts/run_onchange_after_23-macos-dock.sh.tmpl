@@ -1,0 +1,41 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+# Dock apps, in order. Re-runs only when this file changes, replacing the Dock's app list.
+# Opinionated: this REPLACES whatever is pinned in your Dock, so edit the list first.
+# To change: arrange the Dock, then
+#   defaults read com.apple.dock persistent-apps | grep _CFURLString
+# and update the list below. Apps that are not installed are skipped.
+set -euo pipefail
+
+apps=(
+  "/System/Applications/Apps.app"
+  "/Applications/Google Chrome.app"
+  "/System/Applications/Mail.app"
+  "/System/Applications/Calendar.app"
+  "/System/Applications/Notes.app"
+  "/System/Applications/System Settings.app"
+  "/Applications/Ghostty.app"
+  "/Applications/Obsidian.app"
+)
+
+tile() {
+  cat <<EOF
+<dict><key>tile-data</key><dict><key>file-data</key><dict>
+<key>_CFURLString</key><string>$1</string>
+<key>_CFURLStringType</key><integer>0</integer>
+</dict></dict><key>tile-type</key><string>file-tile</string></dict>
+EOF
+}
+
+defaults write com.apple.dock persistent-apps -array
+for app in "${apps[@]}"; do
+  if [ -d "$app" ]; then
+    defaults write com.apple.dock persistent-apps -array-add "$(tile "$app")"
+  else
+    echo "Dock: $app not installed, skipping"
+  fi
+done
+
+killall Dock 2>/dev/null || true
+echo "Dock apps applied."
+{{ end -}}

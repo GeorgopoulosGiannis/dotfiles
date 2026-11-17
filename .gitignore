@@ -1,0 +1,33 @@
+# Finder metadata
+.DS_Store
+
+# Tmux: dependencies are installed via externals; snapshots are private runtime state.
+/dot_tmux/plugins/
+/dot_tmux/resurrect/
+/dot_local/share/tmux/resurrect/
+/dot_local/share/tmux/private_resurrect/
+
+# Pi: only these reviewed configuration/resource locations belong in the repository.
+/dot_pi/agent/*
+!/dot_pi/agent/settings.json.tmpl
+!/dot_pi/agent/keybindings.json
+!/dot_pi/agent/extensions/
+!/dot_pi/agent/skills/
+!/dot_pi/agent/agents/
+
+# Defense in depth: credentials and runtime data must never enter Git.
+/dot_pi/**/auth.json
+/dot_pi/**/private_auth.json
+/dot_pi/**/credentials*.json
+/dot_pi/**/private_credentials*.json
+/dot_pi/**/dot_env*
+/dot_pi/**/private_dot_env*
+/dot_pi/**/*.pem
+/dot_pi/**/*.key
+/dot_pi/**/node_modules/
+/dot_pi/**/dot_venv/
+/dot_pi/**/__pycache__/
+/dot_pi/**/dot_git/
+/dot_pi/**/dot_DS_Store
+/dot_pi/**/dot_profile/
+/dot_pi/**/private_dot_profile/

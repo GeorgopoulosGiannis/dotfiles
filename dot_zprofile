@@ -1,0 +1,20 @@
+# Login shells only. Dedupe PATH first so repeated logins do not grow it.
+typeset -U path PATH
+
+# Homebrew: Apple Silicon (/opt/homebrew) or Intel (/usr/local). Same check as the
+# macOS package install script. Sets PATH, MANPATH, FPATH and HOMEBREW_PREFIX.
+for _brew in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+  if [ -x "$_brew" ]; then
+    eval "$("$_brew" shellenv)"
+    break
+  fi
+done
+unset _brew
+
+# mise shims: node/npm/go resolve even where ~/.zshrc never runs (non-interactive login
+# shells, e.g. Neovide spawning nvim, or GUI apps). Interactive shells additionally run
+# `mise activate` in ~/.zshrc. After Homebrew so the shims win over any brew node/go.
+path=("${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims" $path)
+
+# .NET global tools (`dotnet tool install -g ...`), appended so they never shadow system binaries
+path+=("$HOME/.dotnet/tools")

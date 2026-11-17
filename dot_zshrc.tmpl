@@ -1,0 +1,185 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+{{- if (default false (index . "work")) }}
+
+# Work-only aliases live in the private dotfiles-work repo.
+[[ -r ~/.local/share/dotfiles-work/zshrc ]] && source ~/.local/share/dotfiles-work/zshrc
+{{- end }}
+
+# Fork neovide when launching from terminal
+export NEOVIDE_FORK=1
+
+# Sops age
+export SOPS_AGE_KEY_FILE="$HOME/.config/sops/age/keys.txt"
+
+# Dedupe PATH/FPATH entries (also set in ~/.zshenv)
+typeset -U path PATH fpath FPATH
+path=("$HOME/.local/bin" $path)
+
+# Homebrew prefix, found once without forking `brew` (shellenv in ~/.zprofile sets it
+# for login shells; fall back to the standard Apple Silicon / Intel locations).
+_brew_prefix=${HOMEBREW_PREFIX:-}
+if [[ -z $_brew_prefix ]]; then
+  for _p in /opt/homebrew /usr/local; do
+    [[ -x $_p/bin/brew ]] && { _brew_prefix=$_p; break }
+  done
+  unset _p
+fi
+
+# --- History ---
+HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt SHARE_HISTORY          # share across sessions (implies incremental append)
+setopt EXTENDED_HISTORY       # record timestamps
+setopt HIST_IGNORE_DUPS       # skip consecutive duplicates
+setopt HIST_EXPIRE_DUPS_FIRST # trim duplicates before unique entries
+setopt HIST_IGNORE_SPACE      # a leading space keeps a command out of history
+setopt HIST_REDUCE_BLANKS
+setopt INTERACTIVE_COMMENTS   # allow # comments at the prompt
+
+# --- mise: Node and Go versions (config: ~/.config/mise/config.toml) ---
+# Interactive shells get full activation (PATH follows project versions on cd).
+# Login shells, editors and GUI apps (e.g. Neovide) get shims from ~/.zprofile.
+# The activation script is static per mise binary, so cache it (saves a fork, ~30ms)
+# and regenerate it when mise is updated.
+if (( $+commands[mise] )); then
+  _mise_init="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/mise-activate.zsh"
+  if [[ ! -s $_mise_init || $commands[mise] -nt $_mise_init ]]; then
+    mkdir -p "${_mise_init:h}" && mise activate zsh >| "$_mise_init"
+  fi
+  source "$_mise_init"
+  unset _mise_init
+fi
+
+# --- Keymap: vi mode ---
+bindkey -v
+KEYTIMEOUT=1  # 10ms ESC delay so leaving insert mode feels instant
+
+# --- Completion (initialised once; passage's completer below registers via compdef) ---
+# Rebuild the dump at most once a day; otherwise trust it (-C skips the slow check).
+autoload -Uz compinit
+_zcompdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
+[[ -d ${_zcompdump:h} ]] || mkdir -p "${_zcompdump:h}"
+if [[ -n $_zcompdump(#qN.mh+24) ]]; then
+  compinit -d "$_zcompdump"
+else
+  compinit -C -d "$_zcompdump"
+fi
+unset _zcompdump
+zstyle ':completion:*' menu select
+
+[[ -r ~/powerlevel10k/powerlevel10k.zsh-theme ]] && source ~/powerlevel10k/powerlevel10k.zsh-theme
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Eza Aliases (only if eza is installed)
+if (( $+commands[eza] )); then
+  alias ls='eza --color=always --group-directories-first --icons=auto'
+  alias la='eza -a --color=always --group-directories-first --icons=auto'
+  alias lx='eza -alhbHigUmuS@ --time-style=long-iso --git --color-scale --color=always --group-directories-first --icons=auto'
+fi
+
+# Sync the system clipboard with vi-mode 'p' / 'y'.
+# Picks pbcopy/pbpaste (macOS) or wl-clipboard / xclip (Linux desktop);
+# on a headless server none exist, so the default vi bindings are kept.
+if (( $+commands[pbcopy] )); then
+  _clip_copy()  { pbcopy }
+  _clip_paste() { pbpaste }
+elif (( $+commands[wl-copy] )); then
+  _clip_copy()  { wl-copy }
+  _clip_paste() { wl-paste --no-newline }
+elif (( $+commands[xclip] )); then
+  _clip_copy()  { xclip -selection clipboard }
+  _clip_paste() { xclip -selection clipboard -o }
+fi
+
+if (( $+functions[_clip_copy] )); then
+  # 'p' in vicmd pastes the system clipboard
+  function vi-clip-paste-after {
+    RBUFFER="$(_clip_paste)${RBUFFER}"
+  }
+  zle -N vi-clip-paste-after
+  bindkey -M vicmd 'p' vi-clip-paste-after
+
+  # 'y' in vicmd yanks and also sends the text to the system clipboard
+  function vi-clip-yank {
+    zle vi-yank
+    print -rn -- "$CUTBUFFER" | _clip_copy
+  }
+  zle -N vi-clip-yank
+  bindkey -M vicmd 'y' vi-clip-yank
+fi
+
+# passage (age-based pass): tab completion for subcommands and secret names
+if (( $+commands[passage] )); then
+  _passage_entries() {
+    local store=${PASSAGE_DIR:-$HOME/.passage/store}
+    [[ -d $store ]] || return
+    find "$store" -type f -name '*.age' 2>/dev/null | sed "s|^$store/||; s|\.age\$||" | sort
+  }
+  _passage() {
+    local -a subcmds entries
+    subcmds=(show ls init insert edit generate rm mv cp git version help)
+    entries=(${(f)"$(_passage_entries)"})
+    if (( CURRENT == 2 )); then
+      compadd -a subcmds
+      compadd -a entries
+    else
+      compadd -a entries
+    fi
+  }
+  compdef _passage passage
+
+  # Fuzzy picker (needs fzf): `pp` selects a secret and shows it; `pp -c` copies it
+  # (needs a clipboard tool, so not on a headless server).
+  if (( $+commands[fzf] )); then
+    pp() {
+      local pick
+      if [[ $1 == -c ]] && (( ! $+functions[_clip_copy] )); then
+        print -u2 "pp: no clipboard tool (pbcopy, wl-copy or xclip) found"
+        return 1
+      fi
+      pick=$(_passage_entries | fzf --prompt='passage> ') || return
+      if [[ $1 == -c ]]; then
+        passage show "$pick" | head -n1 | tr -d '\n' | _clip_copy && echo "copied: $pick"
+      else
+        passage show "$pick"
+      fi
+    }
+  fi
+fi
+
+# Direnv
+(( $+commands[direnv] )) && eval "$(direnv hook zsh)"
+
+# --- Plugins: must load after all widgets above are defined ---
+# Homebrew on macOS, apt on Debian/Ubuntu, or cloned by chezmoi into ~/.local/share/zsh.
+# Order matters: zsh-syntax-highlighting first, history-substring-search after it.
+_zsh_plugin_dirs=(${_brew_prefix:+$_brew_prefix/share} /usr/share $HOME/.local/share/zsh)
+for _plugin in zsh-syntax-highlighting zsh-history-substring-search; do
+  for _d in $_zsh_plugin_dirs; do
+    [[ -r $_d/$_plugin/$_plugin.zsh ]] && { source $_d/$_plugin/$_plugin.zsh; break }
+  done
+done
+unset _d _plugin _zsh_plugin_dirs _brew_prefix
+
+# Bind after the plugin loads (and after `bindkey -v` reset the keymap), for both
+# arrow-key encodings (normal / application mode); `k`/`j` search in vi command mode.
+if (( $+functions[history-substring-search-up] )); then
+  for _km in viins vicmd; do
+    bindkey -M $_km '^[[A' history-substring-search-up
+    bindkey -M $_km '^[[B' history-substring-search-down
+    bindkey -M $_km '^[OA' history-substring-search-up
+    bindkey -M $_km '^[OB' history-substring-search-down
+  done
+  bindkey -M vicmd 'k' history-substring-search-up
+  bindkey -M vicmd 'j' history-substring-search-down
+  unset _km
+fi

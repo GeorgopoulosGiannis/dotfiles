@@ -1,0 +1,32 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+# Stats menu bar layout (installed by the package script). Re-runs only when this file changes.
+# Personal layout: edit the module list below to taste.
+# To change: adjust in Stats, then `defaults read eu.exelban.Stats` and update below.
+set -euo pipefail
+
+[ -d /Applications/Stats.app ] || { echo "Stats not installed, skipping"; exit 0; }
+
+# Quit first so Stats does not overwrite these on exit
+osascript -e 'quit app "Stats"' 2>/dev/null || true
+
+d() { defaults write eu.exelban.Stats "$@"; }
+
+d setupProcess -bool true          # skip the first-run setup window
+
+# Shown in the menu bar: CPU, GPU, RAM, disk (mini graphs), network speed
+d CPU_state -bool true;     d CPU_widget -string mini
+d GPU_state -bool true
+d RAM_state -bool true;     d RAM_widget -string mini
+d Disk_state -bool true;    d Disk_widget -string mini
+d Network_state -bool true; d Network_widget -string speed
+
+# Hidden
+d Battery_state -bool false
+d Sensors_state -bool false
+d Bluetooth_state -bool false
+d Clock_state -bool false
+
+open -a Stats
+echo "Stats settings applied."
+{{ end -}}

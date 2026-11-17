@@ -1,0 +1,28 @@
+# git-lfs filter (installed by the package scripts). `required` makes git fail loudly
+# instead of committing raw pointer files when git-lfs is missing.
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[user]
+	name = GeorgopoulosGiannis
+{{- with get . "email" }}
+	email = {{ . }}
+{{- end }}
+[core]
+	editor = {{ if eq (get . "profile" | default "dev") "dev" }}nvim{{ else }}vim{{ end }}
+	quotepath = false
+[init]
+	defaultBranch = main
+[push]
+	autoSetupRemote = true
+[diff]
+	algorithm = histogram
+[rerere]
+	enabled = true
+{{- if (get . "work" | default false) }}
+# Work-only rules (e.g. work email per org) live in the private dotfiles-work repo.
+[include]
+	path = ~/.local/share/dotfiles-work/gitconfig
+{{- end }}

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://pi.dev/schemas/keybindings.schema.json",
+  "tui.select.up": ["up", "ctrl+k"],
+  "tui.select.down": ["down", "ctrl+j"],
+  "tui.altScreen.halfPageUp": "alt+u",
+  "tui.altScreen.halfPageDown": "alt+d",
+  "tui.editor.historyPrevious": "alt+k",
+  "tui.editor.historyNext": "alt+j"
+}

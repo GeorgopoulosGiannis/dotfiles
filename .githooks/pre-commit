@@ -1,0 +1,9 @@
+#!/bin/sh
+# Refuse commits that add secrets. Enabled per clone with
+#   git config core.hooksPath .githooks
+# (chezmoi does this once via .chezmoiscripts/run_once_after_00-dotfiles-git-hooks.sh.tmpl).
+# CI and GitHub push protection run the same check, so a missing scanner only warns here.
+if command -v betterleaks >/dev/null 2>&1; then
+  exec betterleaks git --pre-commit --staged --redact --no-banner .
+fi
+echo "pre-commit: betterleaks not found, skipping the secret scan (brew install betterleaks)" >&2

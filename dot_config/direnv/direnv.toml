@@ -1,0 +1,5 @@
+[global]
+# Auto-load .env files in addition to .envrc. Still gated by `direnv allow`
+# (direnv only loads a directory after you explicitly trust it), so a freshly
+# cloned repo's .env is never read until you approve it.
+load_dotenv = true

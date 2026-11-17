@@ -1,0 +1,38 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+# Menu bar (top bar) system icons and clock. Re-runs only when this file changes.
+# Opinionated personal layout: review before applying on another Mac.
+# To change: adjust in System Settings > Menu Bar, then compare
+#   defaults read com.apple.controlcenter | grep 'VisibleCC'
+#   defaults -currentHost read com.apple.controlcenter
+# and update below. Third-party icons (e.g. Stats) are configured by their own apps.
+set -euo pipefail
+
+cc() { defaults write com.apple.controlcenter "$@"; }
+cchost() { defaults -currentHost write com.apple.controlcenter "$@"; }
+
+# Shown: Wi-Fi, Sound, Display, Battery, Clock, Control Center
+for item in WiFi Sound Display Battery Clock BentoBox-0; do
+  cc "NSStatusItem VisibleCC $item" -bool true
+done
+# Per-module mode (older macOS key): 18 = always show in menu bar,
+# 24 = Control Center only, 8 = hidden
+cchost Sound -int 18
+cchost Display -int 18
+cchost Bluetooth -int 24
+cchost NowPlaying -int 8
+cchost Siri -int 8
+cchost Spotlight -int 8
+cchost VoiceControl -int 8
+
+# Hidden: Spotlight icon (Cmd+Space still works)
+defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
+
+# Clock: weekday and AM/PM, no date
+defaults write com.apple.menuextra.clock ShowDayOfWeek -bool true
+defaults write com.apple.menuextra.clock ShowDate -int 0
+defaults write com.apple.menuextra.clock ShowAMPM -bool true
+
+killall ControlCenter SystemUIServer 2>/dev/null || true
+echo "Menu bar settings applied."
+{{ end -}}
