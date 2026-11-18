@@ -1,13 +1,18 @@
 # dotfiles
 
-My macOS and Debian setup, managed with [chezmoi](https://www.chezmoi.io): zsh, tmux,
-Neovim, git, a handful of macOS preferences, and my configuration for the
-[Pi coding agent](https://github.com/earendil-works/pi) (extensions, skills and subagents).
-
-Feel free to copy anything. Most files are self-contained and commented; the sections
-below explain the parts that are not.
+**Run several coding agents side by side in tmux, and always know which one needs you.** My macOS and Debian setup, managed with [chezmoi](https://www.chezmoi.io), built around the [Pi coding agent](https://github.com/earendil-works/pi).
 
 ![Ghostty with tmux: Neovim with the file tree and LSP hover, Pi coding agent, and the Pi extensions](docs/screenshots/showcase.png)
+
+- **Agent attention queue.** [`notify-done`](dot_pi/agent/extensions/notify-done/README.md) sends a macOS notification and a tmux bell when an agent finishes or is blocked on you. <kbd>prefix</kbd> <kbd>N</kbd> jumps to the next pane that needs you: blocked agents first, then finished ones, oldest first.
+- **Guardrails.** `bash-guard` asks before destructive shell commands and hard-blocks catastrophic ones in subagents.
+- **Dotfiles an agent can maintain.** [`AGENTS.md`](AGENTS.md) tells a coding agent how to edit, sync and commit this repo safely: the live → source workflow, secret checks, one change per commit, and no work data in public.
+- **Careful by default.** Secret scanning in a pre-commit hook and on the full history in CI, tools that are pinned and checksum-verified, and a 7-day release-age cooldown for npm and uv.
+- **The rest:** zsh in about 0.1s, Neovim 0.12 on `vim.pack` with a committed lockfile, tmux that survives reboots, and a minimal `server` profile for Debian boxes.
+
+**Take what you want.** Most files stand alone, and the sections below explain the ones that don't. To see what would change on your machine without applying anything: `chezmoi init GeorgopoulosGiannis/dotfiles && chezmoi diff`.
+
+Ideas, questions and "you should try X" are welcome in [issues](../../issues).
 
 ## What's inside
 
