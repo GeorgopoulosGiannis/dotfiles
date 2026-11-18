@@ -87,19 +87,7 @@ external at your own private repo, or delete the block and answer `work=false`.
 
 ## Dictation (Handy)
 
-[Handy](https://github.com/cjpais/Handy) is a free, open-source speech-to-text app that runs
-entirely on the Mac. Hold <kbd>Option</kbd>+<kbd>Space</kbd> and talk (or tap it to start and
-stop) and the text is pasted into whatever app has focus: the terminal, Neovim, a Pi prompt.
-I use it to talk to coding agents, which is much faster than typing long prompts.
-
-The settings file is a `create_` file: chezmoi writes it only on a Mac where Handy has no
-settings yet, then Handy owns it. Notable choices: launch at login, start hidden (only a
-menu bar icon; Handy needs the tray icon to start hidden), a small, fast on-device model, filler words
-("um", "uh") removed, the clipboard restored after pasting, and **AirPods mode**, which takes
-the AirPods mic over from an iPhone that is playing audio (otherwise recordings come back silent;
-it lives under Advanced → Experimental, so experimental settings are switched on to keep it visible).
-Optional LLM post-processing (<kbd>Option</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd>) is off; its API
-keys stay in Handy and never reach this repo.
+I talk to coding agents instead of typing long prompts, using [Handy](https://github.com/cjpais/Handy): free, open-source, offline speech-to-text that pastes into whatever app has focus. My settings are a `create_` file, so chezmoi writes them only on a Mac where Handy isn't set up yet.
 
 ## Pi coding agent
 
