@@ -21,6 +21,7 @@ do
   vim.o.relativenumber = true
   vim.o.mouse = 'a'
   vim.o.showmode = false -- the statusline already shows it
+  vim.o.cmdheight = 0 -- Hide the command line when idle
 
   -- Scheduled: setting the clipboard provider eagerly slows startup
   vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
