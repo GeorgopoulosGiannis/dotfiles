@@ -71,19 +71,15 @@ chsh -s "$(command -v zsh)"   # then log out and back in
 
 Change an answer later with `chezmoi edit-config`, then `chezmoi diff` and apply.
 
-## Personal vs work machines
+## Separate work settings
 
-The repo is public, so nothing employer-specific lives here. On machines with `work = true`,
-chezmoi additionally clones a **private** repo to `~/.local/share/dotfiles-work`
-(`.chezmoiexternal.toml.tmpl`, refreshed daily, needs `gh auth login` first), and the public
-config only points at it if it exists:
+If you need separate work settings, keep them in a private repo. On machines where you answer `work = true`, chezmoi also clones a private repo to `~/.local/share/dotfiles-work` (set in `.chezmoiexternal.toml.tmpl`, refreshed daily, needs `gh auth login` first). The public config only points at it if it exists:
 
 - `~/.gitconfig` includes its `gitconfig` (per-org work email via `includeIf`)
 - `~/.zshrc` sources its `zshrc` (work aliases)
 - Pi's `settings.json` merges its `pi/settings.json` (work-only packages and skills)
 
-The same flag also selects Pi's default provider/model. To reuse the pattern, point the
-external at your own private repo, or delete the block and answer `work=false`.
+The same flag also picks Pi's default provider and model. To use this, point the external at your own private repo, or delete the block and answer `work=false`.
 
 ## Dictation (Handy)
 
@@ -238,7 +234,7 @@ Things that are easy to trip over, by design or because of how macOS and the app
 - **No server provisioning here.** Dotfiles configure `$HOME`. Creating users, hardening SSH and
   setting up a firewall is infrastructure, and belongs in provisioning code (cloud-init, Ansible)
   that runs when the server is created.
-- **A private repo for work.** Keeps this one public without employer details (see above).
+- **A private repo for work.** Keeps work-only settings out of this public repo (see above).
 
 ## Acknowledgements
 
