@@ -7,7 +7,7 @@ Managed on `dev` machines: `~/.pi/agent/settings.json` (only the keys set in `mo
 | `ask-user-question` | Lets the agent ask you a question: free text, single or multi-select, with an "other" option |
 | `bash-guard` | Prompts before destructive `bash` calls; hard-blocks catastrophic ones in subagents |
 | `browser` | Playwright Chromium tools for debugging live web apps (off by default, `/browser on`) |
-| `custom-header` | Startup header with a binary-π logo |
+| `custom-header` | Startup header with a colour ASCII portrait of my dog, generated with ascii_magic |
 | [`notify-done`](../dot_pi/agent/extensions/notify-done/README.md) | **Mine.** macOS notification + tmux bell when an agent finishes or needs input, with a queue that jumps you to the right tmux pane |
 | `web-fetch` | URL → readable markdown (HTML, PDF, text); public URLs fall back to Jina Reader |
 | `web-search` | **Mine.** Web search via Tavily, with bounded output and offline tests |
