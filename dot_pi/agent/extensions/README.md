@@ -12,7 +12,7 @@ editing). Each lives in its own folder. For type-checking and tests, see [DEVELO
 | [`ask-user-question`](ask-user-question/index.ts) | `ask_user_question` tool: the agent asks you a single question (free text, single- or multi-select, with an "other" option). |
 | [`bash-guard`](bash-guard/README.md) | Prompts before destructive/questionable `bash` calls in the main session; hard-blocks catastrophic ones in subagents. `/bash-guard` toggles it. |
 | [`browser`](browser/README.md) | Playwright-driven headless Chromium tools (`browser_*`) for debugging live web apps; off by default, enabled per session with `/browser on`. |
-| [`custom-header`](custom-header/index.ts) | Startup header with a "binary π" logo; `/builtin-header` restores the default. |
+| [`custom-header`](custom-header/index.ts) | Startup header with a true-colour ASCII portrait of my dog, made with [ascii_magic](https://github.com/LeandroBarone/python-ascii_magic) (`generate_art.py PHOTO` regenerates it); `/builtin-header` restores the default. |
 | [`notify-done`](notify-done/README.md) | macOS notification + tmux bell when an agent finishes or needs you, plus a jumpable attention queue (`/queue`, tmux `prefix N`/`Q`). |
 | [`web-fetch`](web-fetch/README.md) | `web_fetch` tool: URL → readable markdown (HTML, PDF, text), with a guarded Jina Reader fallback. |
 | [`web-search`](web-search/README.md) | `web_search` tool backed by Tavily basic search (needs `TAVILY_API_KEY`). |
