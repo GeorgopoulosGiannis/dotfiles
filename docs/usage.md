@@ -12,6 +12,17 @@ After a Neovim plugin update, `chezmoi add ~/.config/nvim/nvim-pack-lock.json` a
 
 Commits are scanned for secrets by a [betterleaks](https://github.com/betterleaks/betterleaks) pre-commit hook (`.githooks/`, enabled once per machine by a chezmoi script), and again in [CI](../.github/workflows/ci.yml) together with the Pi extension checks and shellcheck.
 
+## Ghostty theme
+
+The shared `~/.config/ghostty/config.ghostty` uses the built-in **TokyoNight Storm**
+theme on both personal and work machines. After editing it, reload Ghostty's config
+with `Cmd+Shift+,` on macOS. Check for errors with `ghostty +validate-config` and
+inspect resolved colors with `ghostty +show-config`.
+
+The background remains translucent (`background-opacity = 0.85`), so the desktop
+behind it affects its appearance. Full-screen apps can draw their own colors;
+Ghostty's theme does not change Neovim or Pi themes.
+
 ## tmux reboot recovery
 
 tmux-resurrect and tmux-continuum save sessions, windows, pane layouts and working directories about every 5 minutes; starting `tmux` after a reboot restores the last snapshot. Commands and pane contents are not restored. `prefix` + `Ctrl-s` saves now, `prefix` + `Ctrl-r` restores. Snapshots stay in `~/.local/share/tmux/resurrect` and are never committed.
