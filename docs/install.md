@@ -40,7 +40,8 @@ Provisioning the machine itself (users, SSH hardening, firewall) is deliberately
 If you need separate work settings, keep them in a private repo. On machines where you answer `work = true`, chezmoi also clones a private repo to `~/.local/share/dotfiles-work` (set in `.chezmoiexternal.toml.tmpl`, refreshed daily, needs `gh auth login` first). The public config only points at it if it exists:
 
 - `~/.gitconfig` includes its `gitconfig` (per-org work email via `includeIf`)
-- `~/.zshrc` sources its `zshrc` (work aliases)
+- `~/.zshrc` sources its `zshrc` (work aliases and PATH additions)
+- An after-script runs its optional, idempotent `install.sh` (work-only packages)
 - Pi's `settings.json` merges its `pi/settings.json` (work-only packages and skills)
 
 The same flag also picks Pi's default provider and model. To use this, point the external at your own private repo, or delete the block and answer `work=false`.

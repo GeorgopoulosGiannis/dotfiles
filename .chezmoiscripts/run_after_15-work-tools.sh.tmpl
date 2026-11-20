@@ -1,0 +1,13 @@
+{{- if (get . "work" | default false) -}}
+#!/usr/bin/env bash
+# Work-only packages live in the private repo, cloned before after-scripts run.
+# Run on every apply so private installer updates do not need a public change.
+set -euo pipefail
+
+installer="$HOME/.local/share/dotfiles-work/install.sh"
+if [ -f "$installer" ]; then
+  bash "$installer"
+else
+  echo "Work package installer not found; skipping: $installer" >&2
+fi
+{{ end -}}
