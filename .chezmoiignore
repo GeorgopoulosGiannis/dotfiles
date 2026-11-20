@@ -49,6 +49,8 @@ docs
 {{ if ne .chezmoi.os "darwin" }}
 # Colima (Docker VM) is macOS-only
 .colima
+# OmniWM (tiling window manager) is macOS-only
+.config/omniwm
 {{ end }}
 
 # macOS app settings (e.g. Handy): only deploy on macOS

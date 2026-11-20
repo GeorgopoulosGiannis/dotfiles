@@ -31,6 +31,7 @@ Full install steps for macOS and Debian are in [docs/install.md](docs/install.md
 |------|-------|
 | Shell | zsh, powerlevel10k, vi mode |
 | Terminal | Ghostty, tmux |
+| Window manager | [OmniWM](docs/omniwm.md): niri-style scrolling tiling, Caps Lock as Hyper |
 | Editor | [Neovim 0.12](dot_config/nvim/README.md), plain vim on servers |
 | Coding agent | [Pi](docs/pi.md) with extensions, skills and subagents |
 | Runtimes | mise (Node, Go), uv (Python) |
@@ -41,6 +42,7 @@ Full install steps for macOS and Debian are in [docs/install.md](docs/install.md
 
 - [Install](docs/install.md): macOS, Debian, servers, separate work settings
 - [Pi coding agent](docs/pi.md): extensions, skills, setup
+- [Window manager](docs/omniwm.md): OmniWM keys, workspaces, syncing its settings
 - [Day to day](docs/usage.md): common commands, tmux recovery, secrets
 - [Design](docs/design.md): why these tools, and known limitations
 
