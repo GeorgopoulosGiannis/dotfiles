@@ -19,6 +19,8 @@
 | `s` / `Shift s` | scratchpad toggle / assign |
 | `m` | focus next monitor |
 
+OmniWM's own top bar (OmniShell) is off: its default style replaces the macOS menu bar and, before macOS 27, cannot show third-party icons such as Stats or ClaudeBar. The OmniWM menu bar icon shows the active workspace name instead. If menu bar icons disappear after re-enabling the bar, it may have switched macOS to auto-hide the menu bar (`defaults read NSGlobalDomain _HIHideMenuBar` prints `1`); turn that off in System Settings > Menu Bar.
+
 Workspaces: 1 Term (Ghostty, Neovide), 2 Web, 3 Notes (Obsidian, Things, Anki), 4 Chat (Slack, Discord), 5 Media, 6–9 free. 4 and 5 live on the secondary display when one is connected and fall back to the laptop otherwise.
 
 OmniWM's Settings window rewrites `settings.toml` (dropping comments), so after changing something there run `chezmoi add ~/.config/omniwm/settings.toml`. The generated `shell/` folder and the runtime state in `~/.local/state/omniwm` are not tracked.
