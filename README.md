@@ -31,7 +31,7 @@ Full install steps for macOS and Debian are in [docs/install.md](docs/install.md
 |------|-------|
 | Shell | zsh, powerlevel10k, vi mode |
 | Terminal | Ghostty, tmux |
-| Window manager | [OmniWM](docs/omniwm.md): niri-style scrolling tiling, Caps Lock as Hyper |
+| Window manager | [OmniWM](docs/omniwm.md): dwindle (BSP) tiling, Caps Lock as Hyper |
 | Editor | [Neovim 0.12](dot_config/nvim/README.md), plain vim on servers |
 | Coding agent | [Pi](docs/pi.md) with extensions, skills and subagents |
 | Runtimes | mise (Node, Go), uv (Python) |
