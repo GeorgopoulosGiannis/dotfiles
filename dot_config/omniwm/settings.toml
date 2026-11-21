@@ -1224,7 +1224,7 @@ binding = "Unassigned"
 id = "removeWindowMark"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+W"
 id = "toggleWorkspaceBarVisibility"
 
 [[hotkeys]]

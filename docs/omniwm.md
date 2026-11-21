@@ -21,6 +21,7 @@
 | `Shift Space` | switch this workspace between dwindle and niri |
 | `s` / `Shift s` | scratchpad toggle / assign |
 | `m` | focus next monitor |
+| `w` | show / hide the workspace bar |
 
 Niri-only keys, for a workspace switched to niri: `c` center column, `t` tabbed column, `,` `.` pull a window into / push it out of a column, `Shift f` full-width column.
 
