@@ -606,11 +606,11 @@ binding = "Hyper+Tab"
 id = "workspaceBackAndForth"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+N"
 id = "switchWorkspace.next"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+P"
 id = "switchWorkspace.previous"
 
 [[hotkeys]]
