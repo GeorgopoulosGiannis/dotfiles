@@ -401,6 +401,11 @@ assignToWorkspace = "5"
 bundleId = "com.amazon.Lassen"
 id = "B600FDBC-5EE6-4F8A-9C9A-38EED95B05B7"
 
+[[appRules]]
+assignToWorkspace = "5"
+bundleId = "com.apple.Music"
+id = "42F6BD51-7AE1-40C7-BA3D-B49A8FE3908D"
+
 [[hotkeys]]
 binding = "Hyper+S"
 id = "toggleScratchpad.1"
