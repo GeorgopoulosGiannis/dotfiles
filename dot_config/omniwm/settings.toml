@@ -110,8 +110,8 @@ workspaceSwipeEnabled = false
 workspaceSwipeFingerCount = 3
 
 [hiddenBar]
-enabled = false
-hiddenBundleIDs = []
+enabled = true
+hiddenBundleIDs = ["com.tddworks.claudebar", "eu.exelban.Stats", "com.pais.handy"]
 rehideIntervalSeconds = 5.0
 
 [island]
@@ -235,7 +235,7 @@ autoHideHideDelayMilliseconds = 0.0
 autoHideRevealDelayMilliseconds = 0.0
 backgroundOpacity = 0.1
 deduplicateAppIcons = false
-enabled = false
+enabled = true
 excludedBundleIDs = []
 fullWidth = false
 fullWidthNotchMode = "rightOfNotch"
@@ -1194,7 +1194,7 @@ binding = "Unassigned"
 id = "toggleWorkspaceBarVisibility"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+I"
 id = "toggleHiddenBarPanel"
 
 [[hotkeys]]
@@ -1212,6 +1212,46 @@ id = "toggleOverview"
 [[hotkeys]]
 binding = "Unassigned"
 id = "toggleSystemStats"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleShellWidget.battery-details"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleShellWidget.clock"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleShellWidget.control-center"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleShellWidget.hidden-bar"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleShellWidget.media"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleShellWidget.notifications"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleShellWidget.system-stats"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleShellWidget.volume"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleShellWidget.wifi"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleShellWidget.workspaces"
 
 [[workspaces]]
 displayName = "Term"

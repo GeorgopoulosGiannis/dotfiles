@@ -21,10 +21,11 @@
 | `Shift Space` | switch this workspace between dwindle and niri |
 | `s` / `Shift s` | scratchpad toggle / assign |
 | `m` | focus next monitor |
+| `i` | menu bar icons of other apps (Hidden Bar) |
 
 Niri-only keys, for a workspace switched to niri: `c` center column, `t` tabbed column, `,` `.` pull a window into / push it out of a column, `Shift f` full-width column.
 
-OmniWM's own top bar (OmniShell) is off: its default style replaces the macOS menu bar and, before macOS 27, cannot show third-party icons such as Stats or ClaudeBar. The OmniWM menu bar icon shows the active workspace name instead. If menu bar icons disappear after re-enabling the bar, it may have switched macOS to auto-hide the menu bar (`defaults read NSGlobalDomain _HIHideMenuBar` prints `1`); turn that off in System Settings > Menu Bar.
+OmniWM's own top bar (OmniShell) replaces the macOS menu bar, which it sets to auto-hide. Other apps' menu bar icons (ClaudeBar, Stats, Handy, listed in `hiddenBar.hiddenBundleIDs`) live in the Hidden Bar strip: <kbd>Caps</kbd>+<kbd>i</kbd> opens it, and clicking an icon opens that app's menu. The Hidden Bar needs macOS 27 and Full Disk Access for OmniWM. To add another app's icon, add its bundle ID (`mdls -raw -name kMDItemCFBundleIdentifier /Applications/App.app`). If you turn the bar off and menu bar icons are still missing, check that the menu bar isn't left on auto-hide (System Settings > Menu Bar).
 
 Workspaces: 1 Term (Ghostty, Neovide), 2 Web, 3 Notes (Obsidian, Things, Anki), 4 Chat (Slack, Discord), 5 Media, 6–9 free. 4 and 5 live on the secondary display when one is connected and fall back to the laptop otherwise.
 
