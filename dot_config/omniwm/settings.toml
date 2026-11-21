@@ -55,7 +55,7 @@ crossesMonitorAtEdge = true
 edgeNavigationInterval = 1.5
 followsMouse = false
 followsMouseOnlyFullyVisible = false
-followsWindowToMonitor = false
+followsWindowToMonitor = true
 lockModifier = "off"
 moveCrossesMonitorAtEdge = true
 moveMouseToFocusedWindow = false
@@ -127,6 +127,16 @@ shell = "system"
 shellExecutable = ""
 terminal = "terminal"
 
+[monitors]
+
+[[monitors.ranking]]
+displayUUID = "A3F606BB-EFC7-44C6-B3E2-8D9AFAEC12A8"
+name = "DELL S2722DC"
+
+[[monitors.ranking]]
+displayUUID = "37D8832A-2D66-02CA-B9F7-8F30A301B230"
+name = "Built-in Retina Display"
+
 [mouseWarp]
 constrainToArrangement = false
 enabled = true
@@ -193,8 +203,22 @@ provider = "ghostty"
 widthPercent = 80.0
 
 [routing]
-arrangements = []
-mode = "macOS"
+mode = "custom"
+
+[[routing.arrangements]]
+id = "FD6F0B66-4B57-48D7-BBB7-4C50DC08EA97"
+
+[[routing.arrangements.monitors]]
+gridColumn = 1
+gridRow = 0
+monitorDisplayUUID = "A3F606BB-EFC7-44C6-B3E2-8D9AFAEC12A8"
+monitorName = "DELL S2722DC"
+
+[[routing.arrangements.monitors]]
+gridColumn = 0
+gridRow = 0
+monitorDisplayUUID = "37D8832A-2D66-02CA-B9F7-8F30A301B230"
+monitorName = "Built-in Retina Display"
 
 [scratchpads]
 
