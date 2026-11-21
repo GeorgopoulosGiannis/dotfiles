@@ -37,7 +37,7 @@ red = 0.0
 
 [clipboard]
 historyEnabled = true
-ignoredTypes = []
+ignoredTypes = ["org.nspasteboard.ConcealedType"]
 maxItemBytes = 8388608
 maxItems = 200
 maxTotalBytes = 67108864
