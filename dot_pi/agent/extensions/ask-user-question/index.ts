@@ -101,6 +101,18 @@ function normalizeOptions(options: Array<{ label: string; value?: string; descri
 		.filter((option) => option.label.length > 0);
 }
 
+// List navigation: arrows plus the user's tui.select.up/down bindings (e.g.
+// ctrl+k/j), plus plain j/k. Plain letters are safe here because the list has
+// no type-to-filter, and edit mode routes keys to the editor before this runs.
+// Do not add plain j/k to the global keybindings: other pi lists filter on typing.
+function isNavUp(data: string, kb: any): boolean {
+	return matchesKey(data, Key.up) || matchesKey(data, "k") || !!kb?.matches?.(data, "tui.select.up");
+}
+
+function isNavDown(data: string, kb: any): boolean {
+	return matchesKey(data, Key.down) || matchesKey(data, "j") || !!kb?.matches?.(data, "tui.select.down");
+}
+
 function getOtherLabel(options: AskOption[]): string {
 	return options.some((option) => option.label.toLowerCase() === "other") ? "Other (custom)" : "Other";
 }
@@ -213,7 +225,7 @@ async function askSingleChoice(
 		{ id: "other", label: otherLabel, value: "__other__", isOther: true },
 	];
 
-	return ctx.ui.custom<AskAnswer | null>((tui: any, theme: any, _kb: any, done: (result: AskAnswer | null) => void) => {
+	return ctx.ui.custom<AskAnswer | null>((tui: any, theme: any, kb: any, done: (result: AskAnswer | null) => void) => {
 		let optionIndex = 0;
 		let editMode = false;
 		let cachedLines: string[] | undefined;
@@ -244,12 +256,12 @@ async function askSingleChoice(
 				return;
 			}
 
-			if (matchesKey(data, Key.up)) {
+			if (isNavUp(data, kb)) {
 				optionIndex = Math.max(0, optionIndex - 1);
 				refresh();
 				return;
 			}
-			if (matchesKey(data, Key.down)) {
+			if (isNavDown(data, kb)) {
 				optionIndex = Math.min(allOptions.length - 1, optionIndex + 1);
 				refresh();
 				return;
@@ -315,7 +327,7 @@ async function askSingleChoice(
 				add(theme.fg("dim", " Enter to submit • Esc to go back"));
 			} else {
 				lines.push("");
-				add(theme.fg("dim", " ↑↓ navigate • Enter select • Esc cancel"));
+				add(theme.fg("dim", " ↑↓/jk navigate • Enter select • Esc cancel"));
 			}
 
 			add(theme.fg("accent", "─".repeat(width)));
@@ -353,7 +365,7 @@ async function askMultiChoice(
 		submitItem,
 	];
 
-	return ctx.ui.custom<AskAnswer[] | null>((tui: any, theme: any, _kb: any, done: (result: AskAnswer[] | null) => void) => {
+	return ctx.ui.custom<AskAnswer[] | null>((tui: any, theme: any, kb: any, done: (result: AskAnswer[] | null) => void) => {
 		let optionIndex = 0;
 		let editMode = false;
 		let cachedLines: string[] | undefined;
@@ -401,12 +413,12 @@ async function askMultiChoice(
 				return;
 			}
 
-			if (matchesKey(data, Key.up)) {
+			if (isNavUp(data, kb)) {
 				optionIndex = Math.max(0, optionIndex - 1);
 				refresh();
 				return;
 			}
-			if (matchesKey(data, Key.down)) {
+			if (isNavDown(data, kb)) {
 				optionIndex = Math.min(allItems.length - 1, optionIndex + 1);
 				refresh();
 				return;
@@ -520,7 +532,7 @@ async function askMultiChoice(
 				if (selected.size === 0) {
 					add(theme.fg("warning", " Select at least one answer before submitting."));
 				}
-				add(theme.fg("dim", " ↑↓ navigate • Space toggle • Enter edit/submit • Esc cancel"));
+				add(theme.fg("dim", " ↑↓/jk navigate • Space toggle • Enter edit/submit • Esc cancel"));
 			}
 
 			add(theme.fg("accent", "─".repeat(width)));
