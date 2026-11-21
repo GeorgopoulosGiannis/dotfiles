@@ -3,3 +3,7 @@
 background-opacity = 0.85
 background-blur = 20
 theme = TokyoNight Storm
+
+# On ssh, install xterm-ghostty terminfo on the remote (and fall back to
+# xterm-256color if that fails) so remote shells don't garble input.
+shell-integration-features = ssh-terminfo,ssh-env
