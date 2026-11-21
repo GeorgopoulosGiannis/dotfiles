@@ -24,7 +24,7 @@
 
 Niri-only keys, for a workspace switched to niri: `c` center column, `t` tabbed column, `,` `.` pull a window into / push it out of a column, `Shift f` full-width column.
 
-The macOS menu bar stays as it is. OmniWM's bar (OmniShell) is cut down to a slim workspaces-only strip below it, top left, and windows tile underneath (`shell/shell.toml`). Its default style is a full-width bar that replaces the menu bar and sets it to auto-hide, which hides other apps' icons such as Stats and ClaudeBar. If menu bar icons go missing, check that the menu bar isn't left on auto-hide (System Settings > Menu Bar).
+The macOS menu bar stays as it is. OmniWM's bar (OmniShell) is cut down to a slim workspaces-only strip below it, top left, and windows tile underneath (`shell/shell.toml`). It hides itself when an app goes native fullscreen (e.g. a YouTube video), via `hideInNativeFullscreen` in `settings.toml`. Its default style is a full-width bar that replaces the menu bar and sets it to auto-hide, which hides other apps' icons such as Stats and ClaudeBar. If menu bar icons go missing, check that the menu bar isn't left on auto-hide (System Settings > Menu Bar).
 
 Workspaces: 1 Term (Ghostty, Neovide), 2 Web, 3 Notes (Obsidian, Anki), 4 Chat (Slack, Discord), 5 Media, 6 Tasks (Things), 7–9 free. At my desk the Dell is Main and the laptop sits to its left as Secondary: 4, 5 and 6 live on the laptop screen, the rest on the Dell. Without an external display everything is on the laptop.
 
