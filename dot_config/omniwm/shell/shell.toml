@@ -1,0 +1,13 @@
+
+[profiles]
+
+[profiles.default]
+center = []
+leading = ["workspaces"]
+trailing = []
+
+[profiles.default.workspaceBar]
+fullWidth = false
+position = "belowMenuBar"
+reserveLayoutSpace = true
+height = 24
