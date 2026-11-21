@@ -674,11 +674,11 @@ binding = "Unassigned"
 id = "centerVisibleColumns"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+Shift+P"
 id = "moveWindowToWorkspaceUp"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+Shift+N"
 id = "moveWindowToWorkspaceDown"
 
 [[hotkeys]]

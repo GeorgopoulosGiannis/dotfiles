@@ -10,7 +10,7 @@
 | `Shift` + `h j k l` | swap the window with its neighbour |
 | `Shift` + arrows | join the neighbouring tile as tabs / take a tab back out |
 | `1`–`9` / `Shift` + | switch workspace / send window; `Tab` back-and-forth |
-| `n` / `p` | next / previous workspace |
+| `n` / `p` / `Shift` + | next / previous workspace / send the window there and follow it |
 | `e` / `Shift e` | flip the split between side by side and stacked / swap the two sides |
 | `-` `=` | shrink / grow the focused window |
 | `r` / `Shift r` | cycle sizes; `b` balances all |
