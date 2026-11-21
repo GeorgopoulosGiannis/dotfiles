@@ -406,6 +406,11 @@ assignToWorkspace = "5"
 bundleId = "com.apple.Music"
 id = "42F6BD51-7AE1-40C7-BA3D-B49A8FE3908D"
 
+[[appRules]]
+assignToWorkspace = "4"
+bundleId = "com.apple.mail"
+id = "1B54CB41-52EF-4976-B43C-272BF6427EA9"
+
 [[hotkeys]]
 binding = "Hyper+S"
 id = "toggleScratchpad.1"
