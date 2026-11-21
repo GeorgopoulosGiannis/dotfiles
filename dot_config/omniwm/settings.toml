@@ -382,7 +382,7 @@ bundleId = "md.obsidian"
 id = "C712AC55-D466-41FC-908C-9AB49DCDCA1F"
 
 [[appRules]]
-assignToWorkspace = "3"
+assignToWorkspace = "6"
 bundleId = "com.culturedcode.ThingsMac"
 id = "2FD196EF-8ED1-4BEF-818C-C7E989AE7864"
 
@@ -1295,12 +1295,13 @@ name = "5"
 type = "secondary"
 
 [[workspaces]]
+displayName = "Tasks"
 id = "5953F2BF-A378-4266-91B2-287174C4FA4D"
 layoutType = "default"
 name = "6"
 
 [workspaces.monitorAssignment]
-type = "main"
+type = "secondary"
 
 [[workspaces]]
 id = "A7D5E104-6985-4516-8ED5-07F144F2A33D"

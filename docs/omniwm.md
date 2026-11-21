@@ -26,6 +26,8 @@ Niri-only keys, for a workspace switched to niri: `c` center column, `t` tabbed 
 
 The macOS menu bar stays as it is. OmniWM's bar (OmniShell) is cut down to a slim workspaces-only strip below it, top left, and windows tile underneath (`shell/shell.toml`). Its default style is a full-width bar that replaces the menu bar and sets it to auto-hide, which hides other apps' icons such as Stats and ClaudeBar. If menu bar icons go missing, check that the menu bar isn't left on auto-hide (System Settings > Menu Bar).
 
-Workspaces: 1 Term (Ghostty, Neovide), 2 Web, 3 Notes (Obsidian, Things, Anki), 4 Chat (Slack, Discord), 5 Media, 6–9 free. 4 and 5 live on the secondary display when one is connected and fall back to the laptop otherwise.
+Workspaces: 1 Term (Ghostty, Neovide), 2 Web, 3 Notes (Obsidian, Anki), 4 Chat (Slack, Discord), 5 Media, 6 Tasks (Things), 7–9 free. At my desk the Dell is Main and the laptop sits to its left as Secondary: 4, 5 and 6 live on the laptop screen, the rest on the Dell. Without an external display everything is on the laptop.
+
+Monitor layouts (`[monitors]`, `[routing]`) are saved per set of connected displays, so another desk keeps its own: run Settings > Displays > Run Monitor Setup there once.
 
 OmniWM's Settings window rewrites `settings.toml` (dropping comments), so after changing something there run `chezmoi add ~/.config/omniwm/settings.toml`. `shell/shell.toml` is tracked too. The generated `shell/default/` folder and the runtime state in `~/.local/state/omniwm` are not tracked.
