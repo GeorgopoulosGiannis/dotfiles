@@ -14,6 +14,7 @@
 !/dot_pi/agent/extensions/
 !/dot_pi/agent/skills/
 !/dot_pi/agent/agents/
+!/dot_pi/agent/prompts/
 
 # Defense in depth: credentials and runtime data must never enter Git.
 /dot_pi/**/auth.json
