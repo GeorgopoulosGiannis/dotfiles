@@ -26,6 +26,19 @@ do
   -- Scheduled: setting the clipboard provider eagerly slows startup
   vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
+  -- Over SSH, always copy via OSC52 so yanks reach the local (Mac) clipboard,
+  -- instead of relying on terminal capability detection, which can silently fail.
+  -- Paste from nvim's own register: OSC52 reads block or prompt in most terminals.
+  if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
+    local osc52 = require 'vim.ui.clipboard.osc52'
+    local function paste() return { vim.split(vim.fn.getreg '"', '\n'), vim.fn.getregtype '"' } end
+    vim.g.clipboard = {
+      name = 'OSC 52',
+      copy = { ['+'] = osc52.copy '+', ['*'] = osc52.copy '*' },
+      paste = { ['+'] = paste, ['*'] = paste },
+    }
+  end
+
   vim.o.breakindent = true
 
   vim.o.undofile = true
