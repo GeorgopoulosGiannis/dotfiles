@@ -85,6 +85,26 @@ require('easy-dotnet').setup {
     },
   },
 }
+-- Workaround (easy-dotnet bug): re-discovery (running another test, saving a test
+-- file) re-registers nodes with default actions. The plugin keeps the old status but
+-- drops PeekResults, so the runner says "No results available" although the server
+-- still has them. Keep PeekResults while the node keeps its previous status.
+do
+  local state = require 'easy-dotnet.test-runner.state'
+  local register = state.register
+  state.register = function(node)
+    local existing = state.nodes[node.id]
+    local actions = node.availableActions
+    if existing and existing.availableActions and actions
+      and vim.tbl_contains(existing.availableActions, 'PeekResults')
+      and not vim.tbl_contains(actions, 'PeekResults')
+    then
+      table.insert(actions, 'PeekResults')
+    end
+    return register(node)
+  end
+end
+
 vim.keymap.set('n', '<leader>dr', '<cmd>Dotnet run<CR>', { desc = '.NET Run' })
 vim.keymap.set('n', '<leader>dd', '<cmd>Dotnet debug default profile<CR>', { desc = '.NET Debug' })
 
