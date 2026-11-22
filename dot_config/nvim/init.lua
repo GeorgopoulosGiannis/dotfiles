@@ -200,6 +200,9 @@ do
       changedelete = { text = '~' }, ---@diagnostic disable-line: missing-fields
     },
     on_attach = function(bufnr)
+      -- Buffer-local so the Git group only shows in which-key where gitsigns is attached.
+      require('which-key').add { { '<leader>g', group = '[G]it', mode = { 'n', 'v' }, buffer = bufnr } }
+
       vim.keymap.set('n', ']c', function()
         if vim.wo.diff then
           vim.cmd.normal { ']c', bang = true }
@@ -243,15 +246,14 @@ do
   require('which-key').setup {
     delay = 0,
     icons = { mappings = vim.g.have_nerd_font },
-    -- Group names for key chains defined across init.lua and lua/plugins/
+    -- Group names for key chains defined across init.lua and lua/plugins/.
+    -- Context-specific groups (Git, Python) are added buffer-locally where they apply.
     spec = {
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
-      { '<leader>g', group = '[G]it', mode = { 'n', 'v' } },
       { '<leader>h', group = '[H]arpoon' },
       { '<leader>d', group = '[D]ebug / .NET' },
       { '<leader>m', group = '[M]arkdown' },
-      { '<leader>p', group = '[P]ython' },
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
     },
   }

@@ -43,7 +43,13 @@ require('dap-go').setup {
     detached = vim.fn.has 'win32' == 0,
   },
 }
-vim.keymap.set('n', '<leader>dt', function() require('dap-go').debug_test() end, { desc = 'Debug: Go [T]est under cursor' })
+vim.api.nvim_create_autocmd('FileType', {
+  group = vim.api.nvim_create_augroup('go-dap-keymaps', { clear = true }),
+  pattern = 'go',
+  callback = function(ev)
+    vim.keymap.set('n', '<leader>dt', function() require('dap-go').debug_test() end, { buffer = ev.buf, desc = 'Debug: Go [T]est under cursor' })
+  end,
+})
 
 -- easy-dotnet wires up the project runner, solution builder, and DAP configs
 require('easy-dotnet').setup {
