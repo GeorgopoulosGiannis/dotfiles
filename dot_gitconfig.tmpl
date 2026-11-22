@@ -17,8 +17,34 @@
 	defaultBranch = main
 [push]
 	autoSetupRemote = true
+	followTags = true
+[pull]
+	rebase = true
+[fetch]
+	prune = true
+[checkout]
+	defaultRemote = origin
+[branch]
+	sort = -committerdate
+[tag]
+	sort = version:refname
+[column]
+	ui = auto
+[help]
+	autocorrect = prompt
+[rebase]
+	updateRefs = true
+	autoSquash = true
+	autoStash = true
+[merge]
+	conflictstyle = zdiff3
+[commit]
+	verbose = true
 [diff]
 	algorithm = histogram
+	colorMoved = default
+	colorMovedWS = allow-indentation-change
+	mnemonicPrefix = true
 [rerere]
 	enabled = true
 {{- if (get . "work" | default false) }}
