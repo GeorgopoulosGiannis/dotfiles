@@ -12,6 +12,8 @@
 | `1`–`9` / `Shift` + | switch workspace / send window; `Tab` back-and-forth |
 | `n` / `p` / `Shift` + | next / previous workspace / send the window there and follow it |
 | `e` / `Shift e` | flip the split between side by side and stacked / swap the two sides |
+| `Shift b` | break the window out of its split: it becomes one half of the screen, everything else the other |
+| arrows / `Esc` | pick where the next window opens (preselect) / cancel |
 | `-` `=` | shrink / grow the focused window |
 | `r` / `Shift r` | cycle sizes; `b` balances all |
 | `f` | fullscreen inside the layout |

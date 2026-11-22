@@ -1060,7 +1060,7 @@ binding = "Hyper+B"
 id = "balanceSizes"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+Shift+B"
 id = "moveToRoot"
 
 [[hotkeys]]
@@ -1096,23 +1096,23 @@ binding = "Hyper+Minus"
 id = "resizeFocusedWindow.shrink"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+Left Arrow"
 id = "preselect.left"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+Right Arrow"
 id = "preselect.right"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+Up Arrow"
 id = "preselect.up"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+Down Arrow"
 id = "preselect.down"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Hyper+Escape"
 id = "preselectClear"
 
 [[hotkeys]]
