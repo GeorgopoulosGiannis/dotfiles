@@ -63,15 +63,11 @@ require('easy-dotnet').setup {
     env = {
       DiffEngine_ToolOrder = 'Neovim|VisualStudioCode|Rider',
     },
-    -- Plain keys inside the runner buffer: the <leader> defaults collide with
-    -- global which-key groups (<leader>p Python, <leader>g Git, <leader>d Debug).
+    -- Runner-buffer keys. Python/Go/Git keys are buffer-local elsewhere, so these
+    -- don't collide. Debug is <leader>D because <leader>d is the global .NET group.
     mappings = {
-      run = { lhs = 'r', desc = 'run test' },
-      run_all = { lhs = 'R', desc = 'run all tests' },
-      debug_test = { lhs = 'd', desc = 'debug test' },
-      peek_stacktrace = { lhs = 'p', desc = 'peek results of failed test' },
-      go_to_file = { lhs = 'gf', desc = 'go to file' },
-      get_build_errors = { lhs = 'e', desc = 'get build errors' },
+      debug_test = { lhs = '<leader>D', desc = 'debug test' },
+      peek_stacktrace = { lhs = '<leader>p', desc = 'peek results of failed test' },
     },
   },
   -- Roslyn LSP managed by easy-dotnet
