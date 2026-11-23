@@ -393,6 +393,11 @@ id = "B6298D5C-C04C-40E9-A25D-03B2F8F4F6EF"
 
 [[appRules]]
 assignToWorkspace = "4"
+bundleId = "com.google.Chrome.app.pommaclcbfghclhalboakcipcmmndhcj"
+id = "C85B1EBF-E626-41CE-81C8-9D91C21E4F9E"
+
+[[appRules]]
+assignToWorkspace = "4"
 bundleId = "com.tinyspeck.slackmacgap"
 id = "11FC78FB-F1D1-43C1-837B-9EC6F9A07E27"
 
