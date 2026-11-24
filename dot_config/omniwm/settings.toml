@@ -74,7 +74,7 @@ top = 0.0
 [general]
 animationSpeed = 1.0
 animationsEnabled = true
-defaultLayoutType = "dwindle"
+defaultLayoutType = "niri"
 hotkeysEnabled = true
 hyperKeyModifiers = "Control+Option+Command"
 ipcEnabled = false
@@ -1260,7 +1260,7 @@ id = "toggleShellWidget.workspaces"
 
 [[workspaces]]
 id = "AD36F001-C57E-41A5-AC1D-DF5249D007F0"
-layoutType = "dwindle"
+layoutType = "niri"
 name = "1"
 
 [workspaces.monitorAssignment]
@@ -1268,7 +1268,7 @@ type = "main"
 
 [[workspaces]]
 id = "454CECD4-5E9D-4ED1-95D7-979D48817F5F"
-layoutType = "dwindle"
+layoutType = "niri"
 name = "2"
 
 [workspaces.monitorAssignment]
@@ -1276,7 +1276,7 @@ type = "main"
 
 [[workspaces]]
 id = "BEB842B5-E894-4791-9FD1-397C3CDD3538"
-layoutType = "dwindle"
+layoutType = "niri"
 name = "3"
 
 [workspaces.monitorAssignment]
@@ -1284,7 +1284,7 @@ type = "main"
 
 [[workspaces]]
 id = "248AA883-2261-4D45-943C-79C0E46A232B"
-layoutType = "dwindle"
+layoutType = "niri"
 name = "4"
 
 [workspaces.monitorAssignment]
@@ -1292,7 +1292,7 @@ type = "main"
 
 [[workspaces]]
 id = "8B8C45D6-CE9E-41D9-BD50-BE4989D5E3DE"
-layoutType = "dwindle"
+layoutType = "niri"
 name = "5"
 
 [workspaces.monitorAssignment]
@@ -1310,7 +1310,7 @@ type = "main"
 [[workspaces]]
 displayName = "Media"
 id = "A7D5E104-6985-4516-8ED5-07F144F2A33D"
-layoutType = "default"
+layoutType = "niri"
 name = "7"
 
 [workspaces.monitorAssignment]
@@ -1319,7 +1319,7 @@ type = "secondary"
 [[workspaces]]
 displayName = "Chat"
 id = "0E18F6B0-345A-4078-8B21-33641F07A861"
-layoutType = "default"
+layoutType = "niri"
 name = "8"
 
 [workspaces.monitorAssignment]
