@@ -1,0 +1,7 @@
+# Native palette with an orange accent so the focused workspace stays
+# readable on a blue wallpaper.
+[light]
+accent = "#C2581A"
+
+[dark]
+accent = "#FF9E64"
