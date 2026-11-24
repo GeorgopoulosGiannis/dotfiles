@@ -9,8 +9,10 @@ Fetches a YouTube video's title and full transcript by pulling captions via `yt-
 
 ## Requirements
 
-- `yt-dlp` on PATH (`brew install yt-dlp`)
-- Python 3
+- Python 3 + `uv` (the script auto-runs itself via `uv run --with youtube-transcript-api` if the lib isn't installed)
+- `yt-dlp` on PATH (fallback only; `brew install yt-dlp`)
+
+Primary path uses `youtube-transcript-api` (innertube), which avoids the HTTP 429s that yt-dlp's `/api/timedtext` downloads frequently hit. Fallback is a single yt-dlp metadata call + direct caption download with exponential backoff.
 
 ## Usage
 

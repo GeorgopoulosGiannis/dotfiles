@@ -1,132 +1,186 @@
 #!/usr/bin/env python3
-"""Fetch a YouTube video's title and transcript via yt-dlp.
+"""Fetch a YouTube video's title and transcript.
 
-Prefers manual English captions, falls back to auto-generated. Uses yt-dlp
-itself to download the caption file so we don't have to deal with SSL/cert
-issues from a bare urllib request.
+Strategy (to avoid HTTP 429 from YouTube's /api/timedtext endpoint):
+  1. youtube-transcript-api (innertube-based; much less rate-limited).
+     If not importable, the script re-execs itself via `uv run --with ...`.
+     Title comes from the lightweight oEmbed endpoint.
+  2. Fallback: yt-dlp metadata (single call) + direct download of the json3
+     caption URL with exponential backoff on 429.
+
+Prefers manual English captions, falls back to auto-generated.
 """
-import sys
-import os
-import glob
-import shutil
-import subprocess
-import tempfile
 import json
+import os
+import re
+import shutil
+import ssl
+import subprocess
+import sys
+import time
+import urllib.parse
+import urllib.request
+
+LANGS = ["en", "en-US", "en-GB"]
+UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
 
 
-def get_metadata(url):
-    cmd = [
-        "yt-dlp",
-        "--dump-json",
-        "--no-warnings",
-        "--skip-download",
-        url,
-    ]
-    try:
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        return json.loads(result.stdout)
-    except subprocess.CalledProcessError as e:
-        print(f"Error executing yt-dlp: {e.stderr}", file=sys.stderr)
-        sys.exit(1)
-    except Exception as e:
-        print(f"Unexpected error: {e}", file=sys.stderr)
-        sys.exit(1)
+def log(msg):
+    print(msg, file=sys.stderr)
 
 
-def pick_english_lang(info):
-    """Return (lang_code, is_auto) for the best English caption track, or None."""
-    subs = info.get("subtitles") or {}
-    auto = info.get("automatic_captions") or {}
-
-    preferred = ["en", "en-US", "en-GB"]
-
-    # 1. Manual, preferred order
-    for lang in preferred:
-        if lang in subs:
-            return lang, False
-    # 2. Any manual en*
-    for lang in subs:
-        if lang.startswith("en"):
-            return lang, False
-    # 3. Auto, preferred order
-    for lang in preferred:
-        if lang in auto:
-            return lang, True
-    # 4. Any auto en*
-    for lang in auto:
-        if lang.startswith("en"):
-            return lang, True
+def video_id(url):
+    m = re.search(r"(?:v=|youtu\.be/|shorts/|embed/|live/)([A-Za-z0-9_-]{11})", url)
+    if m:
+        return m.group(1)
+    if re.fullmatch(r"[A-Za-z0-9_-]{11}", url):
+        return url
     return None
 
 
-def download_subtitle(url, lang, is_auto, outdir):
-    """Use yt-dlp to download the json3 subtitle file. Returns the file path."""
-    cmd = [
-        "yt-dlp",
-        "--skip-download",
-        "--no-warnings",
-        "--sub-format", "json3",
-        "--sub-langs", lang,
-        "--write-auto-subs" if is_auto else "--write-subs",
-        "-o", os.path.join(outdir, "%(id)s.%(ext)s"),
-        url,
-    ]
+def _ssl_ctx():
     try:
-        subprocess.run(cmd, capture_output=True, text=True, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error downloading subtitles via yt-dlp: {e.stderr}", file=sys.stderr)
-        sys.exit(1)
-
-    matches = glob.glob(os.path.join(outdir, "*.json3"))
-    if not matches:
-        print("yt-dlp did not produce a json3 subtitle file.", file=sys.stderr)
-        sys.exit(1)
-    return matches[0]
+        import certifi  # noqa
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return ssl.create_default_context()
 
 
-def extract_text_from_json3(path):
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+def http_get(url, retries=4, timeout=20):
+    """GET with exponential backoff on 429/5xx."""
+    delay = 2
+    for attempt in range(retries + 1):
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            with urllib.request.urlopen(req, timeout=timeout, context=_ssl_ctx()) as r:
+                return r.read().decode("utf-8")
+        except urllib.error.HTTPError as e:
+            if e.code in (429, 500, 502, 503) and attempt < retries:
+                log(f"HTTP {e.code}, retrying in {delay}s...")
+                time.sleep(delay)
+                delay *= 2
+                continue
+            raise
 
-    text_parts = []
-    for event in data.get("events", []):
-        for seg in event.get("segs", []) or []:
-            text = seg.get("utf8", "")
-            if text.strip() and text != "\n":
-                text_parts.append(text.strip())
-    return " ".join(text_parts)
+
+def oembed_title(vid):
+    try:
+        u = "https://www.youtube.com/oembed?format=json&url=" + urllib.parse.quote(
+            f"https://www.youtube.com/watch?v={vid}"
+        )
+        return json.loads(http_get(u, retries=1)).get("title")
+    except Exception:
+        return None
+
+
+# ---------- Strategy 1: youtube-transcript-api ----------
+
+def via_transcript_api(vid):
+    from youtube_transcript_api import YouTubeTranscriptApi
+
+    api = YouTubeTranscriptApi()
+    tlist = api.list(vid)
+    try:
+        t = tlist.find_manually_created_transcript(LANGS)
+    except Exception:
+        try:
+            t = tlist.find_generated_transcript(LANGS)
+        except Exception:
+            # any en* variant
+            t = next((x for x in tlist if x.language_code.startswith("en")), None)
+            if t is None:
+                raise RuntimeError("No English transcript available")
+    log(f"Using {'auto' if t.is_generated else 'manual'} captions ({t.language_code}) via youtube-transcript-api")
+    snippets = t.fetch()
+    return " ".join(s.text.replace("\n", " ").strip() for s in snippets if s.text.strip())
+
+
+# ---------- Strategy 2: yt-dlp (single pass) ----------
+
+def pick_english_track(info):
+    subs = info.get("subtitles") or {}
+    auto = info.get("automatic_captions") or {}
+    order = (
+        [(l, subs) for l in LANGS]
+        + [(l, subs) for l in subs if l.startswith("en")]
+        + [(l, auto) for l in LANGS]
+        + [(l, auto) for l in auto if l.startswith("en")]
+    )
+    for lang, src in order:
+        for fmt in src.get(lang) or []:
+            if fmt.get("ext") == "json3":
+                return lang, src is auto, fmt["url"]
+    return None
+
+
+def via_ytdlp(url):
+    if not shutil.which("yt-dlp"):
+        raise RuntimeError("yt-dlp not on PATH")
+    res = subprocess.run(
+        ["yt-dlp", "--dump-json", "--no-warnings", "--skip-download", url],
+        capture_output=True, text=True,
+    )
+    if res.returncode != 0:
+        raise RuntimeError(f"yt-dlp metadata failed: {res.stderr.strip()}")
+    info = json.loads(res.stdout)
+    pick = pick_english_track(info)
+    if not pick:
+        raise RuntimeError("No English subtitles found")
+    lang, is_auto, sub_url = pick
+    log(f"Downloading {'auto ' if is_auto else ''}captions ({lang}) via yt-dlp URL...")
+    data = json.loads(http_get(sub_url, retries=5))
+    parts = []
+    for ev in data.get("events", []):
+        for seg in ev.get("segs") or []:
+            txt = seg.get("utf8", "")
+            if txt.strip():
+                parts.append(txt.strip())
+    return info.get("title"), " ".join(parts)
 
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python fetch_transcript.py <youtube_url>", file=sys.stderr)
+        log("Usage: fetch_transcript.py <youtube_url>")
         sys.exit(1)
-
     url = sys.argv[1]
-
-    print("Fetching video metadata...", file=sys.stderr)
-    info = get_metadata(url)
-    title = info.get("title", "Unknown_Title")
-
-    pick = pick_english_lang(info)
-    if pick is None:
-        print(f"No English subtitles found for video: {title}", file=sys.stderr)
+    vid = video_id(url)
+    if not vid:
+        log(f"Could not parse video id from: {url}")
         sys.exit(1)
-    lang, is_auto = pick
 
-    tmpdir = tempfile.mkdtemp(prefix="yt-transcript-")
+    # Ensure youtube-transcript-api is available; re-exec under uv if not.
     try:
-        print(
-            f"Downloading {'auto ' if is_auto else ''}captions ({lang})...",
-            file=sys.stderr,
-        )
-        sub_path = download_subtitle(url, lang, is_auto, tmpdir)
-        transcript = extract_text_from_json3(sub_path)
-    finally:
-        shutil.rmtree(tmpdir, ignore_errors=True)
+        import youtube_transcript_api  # noqa
+        have_api = True
+    except ImportError:
+        have_api = False
+        if not os.environ.get("_YT_TRANSCRIPT_REEXEC") and shutil.which("uv"):
+            os.environ["_YT_TRANSCRIPT_REEXEC"] = "1"
+            os.execvp("uv", ["uv", "run", "--quiet", "--with", "youtube-transcript-api",
+                             "--with", "certifi", "python3", os.path.abspath(__file__), url])
 
-    output = {"title": title, "transcript": transcript}
-    print(json.dumps(output, indent=2))
+    errors = []
+    title, transcript = None, None
+
+    if have_api:
+        try:
+            transcript = via_transcript_api(vid)
+            title = oembed_title(vid)
+        except Exception as e:
+            errors.append(f"youtube-transcript-api: {e}")
+            log(f"youtube-transcript-api failed ({type(e).__name__}); falling back to yt-dlp")
+
+    if transcript is None:
+        try:
+            title, transcript = via_ytdlp(url)
+        except Exception as e:
+            errors.append(f"yt-dlp: {e}")
+
+    if not transcript:
+        log("Failed to fetch transcript:\n  " + "\n  ".join(errors))
+        sys.exit(1)
+
+    print(json.dumps({"title": title or "Unknown_Title", "transcript": transcript}, indent=2))
 
 
 if __name__ == "__main__":
