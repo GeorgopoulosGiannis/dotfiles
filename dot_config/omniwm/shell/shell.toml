@@ -2,6 +2,9 @@
 [profiles]
 
 [profiles.default]
+# Dark neutral palette with an orange accent: the focused workspace stays
+# readable on a blue wallpaper (the native accent is blue).
+theme = "monolith"
 center = []
 leading = ["workspaces"]
 trailing = []
@@ -11,3 +14,7 @@ fullWidth = false
 position = "belowMenuBar"
 reserveLayoutSpace = true
 height = 24
+# Solid-ish bar (the default profile makes it fully transparent) so labels
+# stay readable over any wallpaper.
+backgroundOpacity = 0.85
+showItemBackgrounds = true
