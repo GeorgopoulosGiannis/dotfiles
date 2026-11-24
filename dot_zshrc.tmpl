@@ -83,7 +83,7 @@ zstyle ':completion:*' menu select
 if (( $+commands[eza] )); then
   alias ls='eza --color=always --group-directories-first --icons=auto'
   alias la='eza -a --color=always --group-directories-first --icons=auto'
-  alias lx='eza -alhbHigUmuS@ --time-style=long-iso --git --color-scale --color=always --group-directories-first --icons=auto'
+  alias lx='eza -lah --git --time-style=long-iso --color=always --group-directories-first --icons=auto'
 fi
 
 # Sync the system clipboard with vi-mode 'p' / 'y'.
