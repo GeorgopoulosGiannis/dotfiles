@@ -301,7 +301,7 @@ minHeight = 550.0
 minWidth = 950.0
 
 [[appRules]]
-assignToWorkspace = "5"
+assignToWorkspace = "6"
 bundleId = "com.google.Chrome"
 id = "486CEFA6-69AA-4A3C-AF27-BCD38F4F138B"
 minHeight = 375.0
@@ -314,7 +314,7 @@ minHeight = 240.0
 minWidth = 360.0
 
 [[appRules]]
-assignToWorkspace = "5"
+assignToWorkspace = "6"
 bundleId = "com.apple.Safari"
 id = "81426D13-C1A5-475E-AFBC-00BBA05042D0"
 minHeight = 220.0
@@ -339,14 +339,14 @@ minHeight = 420.0
 minWidth = 500.0
 
 [[appRules]]
-assignToWorkspace = "8"
+assignToWorkspace = "7"
 bundleId = "com.spotify.client"
 id = "2DE9390B-0DB4-4D0C-9ABA-06F76F1D4EA9"
 minHeight = 600.0
 minWidth = 800.0
 
 [[appRules]]
-assignToWorkspace = "7"
+assignToWorkspace = "8"
 bundleId = "com.hnc.Discord"
 id = "AF752D95-8497-4844-BE20-4C93E73BAEF2"
 minHeight = 500.0
@@ -371,7 +371,7 @@ minHeight = 320.0
 minWidth = 660.0
 
 [[appRules]]
-assignToWorkspace = "6"
+assignToWorkspace = "9"
 bundleId = "md.obsidian"
 id = "C712AC55-D466-41FC-908C-9AB49DCDCA1F"
 
@@ -381,32 +381,32 @@ bundleId = "com.culturedcode.ThingsMac"
 id = "2FD196EF-8ED1-4BEF-818C-C7E989AE7864"
 
 [[appRules]]
-assignToWorkspace = "6"
+assignToWorkspace = "9"
 bundleId = "net.ankiweb.launcher"
 id = "B6298D5C-C04C-40E9-A25D-03B2F8F4F6EF"
 
 [[appRules]]
-assignToWorkspace = "7"
+assignToWorkspace = "8"
 bundleId = "com.google.Chrome.app.pommaclcbfghclhalboakcipcmmndhcj"
 id = "C85B1EBF-E626-41CE-81C8-9D91C21E4F9E"
 
 [[appRules]]
-assignToWorkspace = "7"
+assignToWorkspace = "8"
 bundleId = "com.tinyspeck.slackmacgap"
 id = "11FC78FB-F1D1-43C1-837B-9EC6F9A07E27"
 
 [[appRules]]
-assignToWorkspace = "8"
+assignToWorkspace = "7"
 bundleId = "com.amazon.Lassen"
 id = "B600FDBC-5EE6-4F8A-9C9A-38EED95B05B7"
 
 [[appRules]]
-assignToWorkspace = "8"
+assignToWorkspace = "7"
 bundleId = "com.apple.Music"
 id = "42F6BD51-7AE1-40C7-BA3D-B49A8FE3908D"
 
 [[appRules]]
-assignToWorkspace = "7"
+assignToWorkspace = "8"
 bundleId = "com.apple.mail"
 id = "1B54CB41-52EF-4976-B43C-272BF6427EA9"
 
@@ -1291,16 +1291,15 @@ name = "4"
 type = "main"
 
 [[workspaces]]
-displayName = "Web"
 id = "8B8C45D6-CE9E-41D9-BD50-BE4989D5E3DE"
-layoutType = "niri"
+layoutType = "dwindle"
 name = "5"
 
 [workspaces.monitorAssignment]
 type = "main"
 
 [[workspaces]]
-displayName = "Notes"
+displayName = "Web"
 id = "5953F2BF-A378-4266-91B2-287174C4FA4D"
 layoutType = "niri"
 name = "6"
@@ -1309,7 +1308,7 @@ name = "6"
 type = "main"
 
 [[workspaces]]
-displayName = "Chat"
+displayName = "Media"
 id = "A7D5E104-6985-4516-8ED5-07F144F2A33D"
 layoutType = "default"
 name = "7"
@@ -1318,7 +1317,7 @@ name = "7"
 type = "secondary"
 
 [[workspaces]]
-displayName = "Media"
+displayName = "Chat"
 id = "0E18F6B0-345A-4078-8B21-33641F07A861"
 layoutType = "default"
 name = "8"
@@ -1327,9 +1326,9 @@ name = "8"
 type = "secondary"
 
 [[workspaces]]
-displayName = "Tasks"
+displayName = "Notes"
 id = "8D4D711C-2B2F-4FEC-86BF-FA952037738A"
-layoutType = "default"
+layoutType = "niri"
 name = "9"
 
 [workspaces.monitorAssignment]
