@@ -1297,7 +1297,7 @@ name = "5"
 type = "main"
 
 [[workspaces]]
-displayName = "Web"
+displayName = "6 Web"
 id = "5953F2BF-A378-4266-91B2-287174C4FA4D"
 layoutType = "niri"
 name = "6"
@@ -1306,7 +1306,7 @@ name = "6"
 type = "main"
 
 [[workspaces]]
-displayName = "Media"
+displayName = "7 Media"
 id = "A7D5E104-6985-4516-8ED5-07F144F2A33D"
 layoutType = "niri"
 name = "7"
@@ -1315,7 +1315,7 @@ name = "7"
 type = "secondary"
 
 [[workspaces]]
-displayName = "Chat"
+displayName = "8 Chat"
 id = "0E18F6B0-345A-4078-8B21-33641F07A861"
 layoutType = "niri"
 name = "8"
@@ -1324,7 +1324,7 @@ name = "8"
 type = "secondary"
 
 [[workspaces]]
-displayName = "Tasks"
+displayName = "9 Tasks"
 id = "8D4D711C-2B2F-4FEC-86BF-FA952037738A"
 layoutType = "niri"
 name = "9"
