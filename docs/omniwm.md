@@ -23,9 +23,10 @@
 | `Shift Space` | switch this workspace between dwindle and niri |
 | `s` / `Shift s` | scratchpad toggle / assign |
 | `m` | focus next monitor |
+| `[` / `]` | temporarily move the whole workspace to the left / right monitor |
 | `w` | show / hide the workspace bar |
 
-Outside Hyper, **Ctrl + Option + h/j/k/l** temporarily moves the focused workspace and all its windows to the monitor on the left/below/above/right. Use the opposite direction to bring it back; this does not rewrite its saved Home Monitor. Press the actual Ctrl and Option keys, not Caps Lock.
+**Hyper + `[` / `]`** temporarily moves the focused workspace and all its windows to the left / right monitor. Use the opposite direction to bring it back; this does not rewrite its saved Home Monitor.
 
 Niri-only keys, for a workspace switched to niri: `c` center column, `t` tabbed column, `,` `.` pull a window into / push it out of a column, `Shift f` full-width column.
 

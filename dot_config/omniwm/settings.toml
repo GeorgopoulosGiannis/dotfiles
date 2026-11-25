@@ -809,19 +809,19 @@ binding = "Unassigned"
 id = "focusMonitorLast"
 
 [[hotkeys]]
-binding = "Control+Option+H"
+binding = "Hyper+Left Bracket"
 id = "moveWorkspaceToMonitor.left"
 
 [[hotkeys]]
-binding = "Control+Option+L"
+binding = "Hyper+Right Bracket"
 id = "moveWorkspaceToMonitor.right"
 
 [[hotkeys]]
-binding = "Control+Option+K"
+binding = "Unassigned"
 id = "moveWorkspaceToMonitor.up"
 
 [[hotkeys]]
-binding = "Control+Option+J"
+binding = "Unassigned"
 id = "moveWorkspaceToMonitor.down"
 
 [[hotkeys]]
