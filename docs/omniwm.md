@@ -25,6 +25,8 @@
 | `m` | focus next monitor |
 | `w` | show / hide the workspace bar |
 
+Outside Hyper, **Ctrl + Option + h/j/k/l** temporarily moves the focused workspace and all its windows to the monitor on the left/below/above/right. Use the opposite direction to bring it back; this does not rewrite its saved Home Monitor. Press the actual Ctrl and Option keys, not Caps Lock.
+
 Niri-only keys, for a workspace switched to niri: `c` center column, `t` tabbed column, `,` `.` pull a window into / push it out of a column, `Shift f` full-width column.
 
 The macOS menu bar stays as it is. OmniWM's bar (OmniShell) is cut down to a slim workspaces-only strip below it, top left, and windows tile underneath (`shell/shell.toml`). It hides itself when an app goes native fullscreen (e.g. a YouTube video), via `hideInNativeFullscreen` in `settings.toml`. Its default style is a full-width bar that replaces the menu bar and sets it to auto-hide, which hides other apps' icons such as Stats and ClaudeBar. If menu bar icons go missing, check that the menu bar isn't left on auto-hide (System Settings > Menu Bar).
