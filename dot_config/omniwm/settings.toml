@@ -299,7 +299,6 @@ minHeight = 550.0
 minWidth = 950.0
 
 [[appRules]]
-assignToWorkspace = "6"
 bundleId = "com.google.Chrome"
 id = "486CEFA6-69AA-4A3C-AF27-BCD38F4F138B"
 minHeight = 375.0
@@ -312,7 +311,6 @@ minHeight = 240.0
 minWidth = 360.0
 
 [[appRules]]
-assignToWorkspace = "6"
 bundleId = "com.apple.Safari"
 id = "81426D13-C1A5-475E-AFBC-00BBA05042D0"
 minHeight = 220.0
@@ -1297,7 +1295,6 @@ name = "5"
 type = "main"
 
 [[workspaces]]
-displayName = "6 Web"
 id = "5953F2BF-A378-4266-91B2-287174C4FA4D"
 layoutType = "niri"
 name = "6"
