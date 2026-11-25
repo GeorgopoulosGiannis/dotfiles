@@ -130,11 +130,9 @@ terminal = "terminal"
 [monitors]
 
 [[monitors.ranking]]
-displayUUID = "A3F606BB-EFC7-44C6-B3E2-8D9AFAEC12A8"
 name = "DELL S2722DC"
 
 [[monitors.ranking]]
-displayUUID = "37D8832A-2D66-02CA-B9F7-8F30A301B230"
 name = "Built-in Retina Display"
 
 [mouseWarp]

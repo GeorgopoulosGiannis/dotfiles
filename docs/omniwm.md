@@ -31,6 +31,8 @@ The macOS menu bar stays as it is. OmniWM's bar (OmniShell) is cut down to a sli
 
 Workspaces: 1 Term (Ghostty, Neovide), 2 Web, 3 Notes (Obsidian, Anki), 4 Chat (Slack, Discord), 5 Media, 6 Tasks (Things), 7–9 free. At my desk the Dell is Main and the laptop sits to its left as Secondary: 4, 5 and 6 live on the laptop screen, the rest on the Dell. Without an external display everything is on the laptop.
 
-Monitor layouts (`[monitors]`, `[routing]`) are saved per set of connected displays, so another desk keeps its own: run Settings > Displays > Run Monitor Setup there once.
+Monitor roles (`[monitors]`) rank the Dell above the built-in display by name, without display UUIDs, so Main/Secondary workspace assignments work across laptops. Name matching requires exactly one connected display with that name. Keep these ranking entries UUID-free when syncing Settings changes; the UI may record hardware-specific IDs.
+
+Routing grids (`[routing]`) are saved per set of connected displays, so another laptop or desk keeps its own: run Settings > Displays > Run Monitor Setup there once if directional navigation needs configuring. Preserve existing arrangements when syncing.
 
 OmniWM's Settings window rewrites `settings.toml` (dropping comments), so after changing something there run `chezmoi add ~/.config/omniwm/settings.toml`. `shell/shell.toml` is tracked too. The generated `shell/default/` folder and the runtime state in `~/.local/state/omniwm` are not tracked.
