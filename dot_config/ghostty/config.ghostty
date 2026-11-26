@@ -7,7 +7,3 @@ theme = TokyoNight Storm
 # On ssh, install xterm-ghostty terminfo on the remote (and fall back to
 # xterm-256color if that fails) so remote shells don't garble input.
 shell-integration-features = ssh-terminfo,ssh-env
-
-# Hyper+Shift+Return (Hyper = ctrl+opt+cmd via OmniWM Caps Lock): new Ghostty
-# window from anywhere. Needs Ghostty running and Accessibility permission.
-keybind = global:ctrl+alt+super+shift+enter=new_window
