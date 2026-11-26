@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# wsname: temporarily label an OmniWM workspace in the bar, e.g. "1 Project X".
+#
+#   wsname Project X     label the focused workspace "<n> Project X"
+#   wsname -w 3 Infra    label workspace 3 "3 Infra"
+#   wsname               clear the focused workspace's label
+#   wsname -w 3          clear workspace 3's label
+#   wsname --clear-all   clear the labels of the free workspaces 1-6
+#
+# OmniWM stores the label in ~/.config/omniwm/settings.toml (displayName). These labels
+# are local only: the dotfiles pre-commit hook refuses to commit labels on workspaces 1-6.
+# Needs ipcEnabled = true in settings.toml.
+set -euo pipefail
+
+if [[ ${1:-} == --clear-all ]]; then
+  for n in 1 2 3 4 5 6; do omniwmctl workspace rename "$n" "" >/dev/null; done
+  exit 0
+fi
+
+if [[ ${1:-} == -w ]]; then
+  ws=${2:?usage: wsname -w <workspace> [label]}
+  shift 2
+else
+  ws=$(omniwmctl query workspaces --focused --fields raw-name --format json |
+    jq -r '.result.payload.workspaces[0].rawName')
+fi
+
+if (($#)); then
+  omniwmctl workspace rename "$ws" "$ws $*" >/dev/null
+else
+  omniwmctl workspace rename "$ws" "" >/dev/null
+fi

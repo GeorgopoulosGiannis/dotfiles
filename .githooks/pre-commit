@@ -3,6 +3,24 @@
 #   git config core.hooksPath .githooks
 # (chezmoi does this once via .chezmoiscripts/run_once_after_00-dotfiles-git-hooks.sh.tmpl).
 # CI and GitHub push protection run the same check, so a missing scanner only warns here.
+
+# Labels on the free OmniWM workspaces 1-6 are temporary per-machine project names
+# (set with `wsname`) and must never be synced. Only 7-9 have permanent labels.
+omniwm=dot_config/omniwm/settings.toml
+if git diff --cached --name-only | grep -qx "$omniwm"; then
+  bad=$(git show ":$omniwm" | awk '
+    /^\[\[workspaces\]\]/ { if (dn != "" && name ~ /^"[1-6]"$/) print name; dn = ""; name = ""; inws = 1; next }
+    /^\[/ { if (dn != "" && name ~ /^"[1-6]"$/) print name; dn = ""; name = ""; inws = 0; next }
+    inws && /^displayName = / { dn = $0 }
+    inws && /^name = / { name = $3 }
+    END { if (dn != "" && name ~ /^"[1-6]"$/) print name }')
+  if [ -n "$bad" ]; then
+    echo "pre-commit: $omniwm has temporary labels on workspaces $(echo $bad | tr -d '"')." >&2
+    echo "  Clear them with \`wsname --clear-all\`, then \`chezmoi add ~/.config/omniwm/settings.toml\`." >&2
+    exit 1
+  fi
+fi
+
 if command -v betterleaks >/dev/null 2>&1; then
   exec betterleaks git --pre-commit --staged --redact --no-banner .
 fi
