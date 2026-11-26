@@ -9,6 +9,10 @@ node = "26"
 # Go: current stable minor. Mason builds goimports with it.
 go = "1.27"
 
+[env]
+# Keep GOPATH (module cache etc.) out of $HOME; Go defaults to ~/go otherwise.
+GOPATH = "{{env.HOME}}/.cache/go"
+
 [settings]
 # No surprise downloads: install only through `mise install`, never implicitly when
 # a shim, `mise exec` or a `cd` hits a missing version.
