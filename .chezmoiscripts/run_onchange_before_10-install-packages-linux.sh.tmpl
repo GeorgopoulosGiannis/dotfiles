@@ -29,7 +29,7 @@ command -v fdfind >/dev/null && ln -sf "$(command -v fdfind)" "$HOME/.local/bin/
 $SUDO apt-get install -y build-essential direnv
 
 # Optional extras: not packaged on older Debian releases, so don't fail if missing
-for pkg in eza age sops gh; do
+for pkg in eza age sops gh tealdeer; do
   $SUDO apt-get install -y "$pkg" || echo "note: $pkg not available via apt, skipping" >&2
 done
 

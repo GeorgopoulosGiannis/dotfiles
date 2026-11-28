@@ -1,0 +1,5 @@
+# tealdeer (tldr). Keep the page cache fresh without running `tldr --update`;
+# also fetches pages on first use on a new machine.
+[updates]
+auto_update = true
+auto_update_interval_hours = 720
