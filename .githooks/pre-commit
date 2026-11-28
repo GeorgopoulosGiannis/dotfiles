@@ -15,7 +15,7 @@ if git diff --cached --name-only | grep -qx "$omniwm"; then
     inws && /^name = / { name = $3 }
     END { if (dn != "" && name ~ /^"[1-6]"$/) print name }')
   if [ -n "$bad" ]; then
-    echo "pre-commit: $omniwm has temporary labels on workspaces $(echo $bad | tr -d '"')." >&2
+    echo "pre-commit: $omniwm has temporary labels on workspaces $(printf '%s\n' "$bad" | tr -d '"' | paste -sd ' ' -)." >&2
     echo "  Clear them with \`wsname --clear-all\`, then \`chezmoi add ~/.config/omniwm/settings.toml\`." >&2
     exit 1
   fi
