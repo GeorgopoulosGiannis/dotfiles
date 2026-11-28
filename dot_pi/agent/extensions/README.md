@@ -13,6 +13,7 @@ editing). Each lives in its own folder. For type-checking and tests, see [DEVELO
 | [`bash-guard`](bash-guard/README.md) | Prompts before destructive/questionable `bash` calls in the main session; hard-blocks catastrophic ones in subagents. `/bash-guard` toggles it. |
 | [`browser`](browser/README.md) | Playwright-driven headless Chromium tools (`browser_*`) for debugging live web apps; off by default, enabled per session with `/browser on`. |
 | [`custom-header`](custom-header/index.ts) | Startup header with a "binary π" logo; `/builtin-header` restores the default. |
+| [`diagrams`](diagrams/README.md) | `diagram` tool: interactive Archify diagrams with an inline terminal preview and a live browser viewer; `/diagram auto\|always\|off`, `/diagrams`. |
 | [`notify-done`](notify-done/README.md) | macOS notification + tmux bell when an agent finishes or needs you, plus a jumpable attention queue (`/queue`, tmux `prefix N`/`Q`). |
 | [`web-fetch`](web-fetch/README.md) | `web_fetch` tool: URL → readable markdown (HTML, PDF, text), with a guarded Jina Reader fallback. |
 | [`web-search`](web-search/README.md) | `web_search` tool backed by Tavily basic search (needs `TAVILY_API_KEY`). |
