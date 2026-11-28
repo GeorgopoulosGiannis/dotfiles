@@ -1,9 +1,16 @@
+# Direnv, part 1: load the startup directory's .envrc before instant prompt, so its
+# "direnv: loading ..." output doesn't trigger p10k's console-output warning.
+(( $+commands[direnv] )) && emulate zsh -c "$(direnv export zsh)"
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
+
+# Direnv, part 2: install the hook that reloads on cd (prints nothing at startup now).
+(( $+commands[direnv] )) && emulate zsh -c "$(direnv hook zsh)"
 
 {{- if (default false (index . "work")) }}
 
@@ -155,9 +162,6 @@ if (( $+commands[passage] )); then
     }
   fi
 fi
-
-# Direnv
-(( $+commands[direnv] )) && eval "$(direnv hook zsh)"
 
 # --- Plugins: must load after all widgets above are defined ---
 # Homebrew on macOS, apt on Debian/Ubuntu, or cloned by chezmoi into ~/.local/share/zsh.
